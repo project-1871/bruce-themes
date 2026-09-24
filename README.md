@@ -5,72 +5,59 @@
 **Chromatic-aberration glitch themes for [Bruce](https://github.com/BruceDevices/firmware) ESP32 firmware,
 generated straight from [Omarchy](https://omarchy.org) desktop color palettes.**
 
-<img src="previews/japglitch-boot.gif" width="320" alt="Japglitch boot animation">&nbsp;&nbsp;<img src="previews/neon-unix-legs-boot.gif" width="320" alt="Neon Unix Legs boot animation">
-<br><img src="previews/hypr-heels-boot.gif" width="320" alt="Hypr Heels boot animation">&nbsp;&nbsp;<img src="previews/omarfu-boot.gif" width="320" alt="Omarfu boot animation">
-<br><img src="previews/redflag-sword-boot.gif" width="320" alt="Redflag Sword boot animation">
+<img src="previews/gallery.gif" width="820" alt="All theme boot animations">
 
-`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `fits in 192 KB of LittleFS`
+`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `16 themes` · `each fits in 192 KB of LittleFS`
 
 </div>
 
 ---
 
-## ▌Themes
+## ▌Themes (16)
 
-### `japglitch`
-Pale lime on midnight purple, split into magenta/cyan.
+Every theme is built from the Omarchy theme with the same name. Colors are Bruce RGB565 values.
 
-<img src="previews/japglitch-icons.png" width="600" alt="japglitch icons">
+| Theme | Icons | Text / dim / bg | LED |
+|---|---|---|---|
+| **`arch-mosaic`**<br><sub>[boot](previews/arch-mosaic-boot.gif)</sub> | <img src="previews/arch-mosaic-icons.png" width="420"> | ![](https://placehold.co/12x12/F6F6EE/F6F6EE.png) ![](https://placehold.co/12x12/A4A19C/A4A19C.png) ![](https://placehold.co/12x12/292C29/292C29.png)<br><sub>`f7bd` `a513` `2965`</sub> | ![](https://placehold.co/12x12/2DB413/2DB413.png) |
+| **`arch-osi`**<br><sub>[boot](previews/arch-osi-boot.gif)</sub> | <img src="previews/arch-osi-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFAF6/FFFAF6.png) ![](https://placehold.co/12x12/A4A5A4/A4A5A4.png) ![](https://placehold.co/12x12/101010/101010.png)<br><sub>`ffde` `a534` `1082`</sub> | ![](https://placehold.co/12x12/D32B1B/D32B1B.png) |
+| **`auto-wallpaper`**<br><sub>[boot](previews/auto-wallpaper-boot.gif)</sub> | <img src="previews/auto-wallpaper-icons.png" width="420"> | ![](https://placehold.co/12x12/FFF2BD/FFF2BD.png) ![](https://placehold.co/12x12/AC9D6A/AC9D6A.png) ![](https://placehold.co/12x12/101410/101410.png)<br><sub>`ff97` `aced` `10a2`</sub> | ![](https://placehold.co/12x12/47CBFB/47CBFB.png) |
+| **`hypr-heels`**<br><sub>[boot](previews/hypr-heels-boot.gif)</sub> | <img src="previews/hypr-heels-icons.png" width="420"> | ![](https://placehold.co/12x12/FFEEFF/FFEEFF.png) ![](https://placehold.co/12x12/AC99AC/AC99AC.png) ![](https://placehold.co/12x12/181010/181010.png)<br><sub>`ff7f` `acd5` `1882`</sub> | ![](https://placehold.co/12x12/F5003E/F5003E.png) |
+| **`japglitch`**<br><sub>[boot](previews/japglitch-boot.gif)</sub> | <img src="previews/japglitch-icons.png" width="420"> | ![](https://placehold.co/12x12/F6FAB4/F6FAB4.png) ![](https://placehold.co/12x12/A4A562/A4A562.png) ![](https://placehold.co/12x12/201C29/201C29.png)<br><sub>`f7d6` `a52c` `20e5`</sub> | ![](https://placehold.co/12x12/C921E4/C921E4.png) |
+| **`linux-course-glitch`**<br><sub>[boot](previews/linux-course-glitch-boot.gif)</sub> | <img src="previews/linux-course-glitch-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFAF6/FFFAF6.png) ![](https://placehold.co/12x12/ACA5A4/ACA5A4.png) ![](https://placehold.co/12x12/202820/202820.png)<br><sub>`ffde` `ad34` `2144`</sub> | ![](https://placehold.co/12x12/0DBBF1/0DBBF1.png) |
+| **`linux-filmstrip`**<br><sub>[boot](previews/linux-filmstrip-boot.gif)</sub> | <img src="previews/linux-filmstrip-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFAF6/FFFAF6.png) ![](https://placehold.co/12x12/A4A5A4/A4A5A4.png) ![](https://placehold.co/12x12/101008/101008.png)<br><sub>`ffde` `a534` `1081`</sub> | ![](https://placehold.co/12x12/EDC402/EDC402.png) |
+| **`linux-fishnet`**<br><sub>[boot](previews/linux-fishnet-boot.gif)</sub> | <img src="previews/linux-fishnet-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFAFF/FFFAFF.png) ![](https://placehold.co/12x12/A4A5A4/A4A5A4.png) ![](https://placehold.co/12x12/101410/101410.png)<br><sub>`ffdf` `a534` `10a2`</sub> | ![](https://placehold.co/12x12/48F08B/48F08B.png) |
+| **`linux-mask-glitch`**<br><sub>[boot](previews/linux-mask-glitch-boot.gif)</sub> | <img src="previews/linux-mask-glitch-icons.png" width="420"> | ![](https://placehold.co/12x12/E6EEF6/E6EEF6.png) ![](https://placehold.co/12x12/94999C/94999C.png) ![](https://placehold.co/12x12/202429/202429.png)<br><sub>`e77e` `94d3` `2125`</sub> | ![](https://placehold.co/12x12/379FD6/379FD6.png) |
+| **`neon-unix-legs`**<br><sub>[boot](previews/neon-unix-legs-boot.gif)</sub> | <img src="previews/neon-unix-legs-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFFA4/FFFFA4.png) ![](https://placehold.co/12x12/ACAA52/ACAA52.png) ![](https://placehold.co/12x12/101410/101410.png)<br><sub>`fff4` `ad4a` `10a2`</sub> | ![](https://placehold.co/12x12/FC2866/FC2866.png) |
+| **`omarfu`**<br><sub>[boot](previews/omarfu-boot.gif)</sub> | <img src="previews/omarfu-icons.png" width="420"> | ![](https://placehold.co/12x12/E6F2DE/E6F2DE.png) ![](https://placehold.co/12x12/949D8B/949D8B.png) ![](https://placehold.co/12x12/101410/101410.png)<br><sub>`e79b` `94f1` `10a2`</sub> | ![](https://placehold.co/12x12/67D830/67D830.png) |
+| **`redflag-sword`**<br><sub>[boot](previews/redflag-sword-boot.gif)</sub> | <img src="previews/redflag-sword-icons.png" width="420"> | ![](https://placehold.co/12x12/EEF2F6/EEF2F6.png) ![](https://placehold.co/12x12/9C9DA4/9C9DA4.png) ![](https://placehold.co/12x12/292820/292820.png)<br><sub>`ef9e` `9cf4` `2944`</sub> | ![](https://placehold.co/12x12/E3020F/E3020F.png) |
+| **`sudo-tatami`**<br><sub>[boot](previews/sudo-tatami-boot.gif)</sub> | <img src="previews/sudo-tatami-icons.png" width="420"> | ![](https://placehold.co/12x12/EEEEEE/EEEEEE.png) ![](https://placehold.co/12x12/9C999C/9C999C.png) ![](https://placehold.co/12x12/202429/202429.png)<br><sub>`ef7d` `9cd3` `2125`</sub> | ![](https://placehold.co/12x12/1697D9/1697D9.png) |
+| **`tux-mosaic`**<br><sub>[boot](previews/tux-mosaic-boot.gif)</sub> | <img src="previews/tux-mosaic-icons.png" width="420"> | ![](https://placehold.co/12x12/F6F6F6/F6F6F6.png) ![](https://placehold.co/12x12/A4A1A4/A4A1A4.png) ![](https://placehold.co/12x12/181818/181818.png)<br><sub>`f7be` `a514` `18c3`</sub> | ![](https://placehold.co/12x12/26FB43/26FB43.png) |
+| **`unix-binary`**<br><sub>[boot](previews/unix-binary-boot.gif)</sub> | <img src="previews/unix-binary-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFAF6/FFFAF6.png) ![](https://placehold.co/12x12/ACA5A4/ACA5A4.png) ![](https://placehold.co/12x12/101410/101410.png)<br><sub>`ffde` `ad34` `10a2`</sub> | ![](https://placehold.co/12x12/B1430D/B1430D.png) |
+| **`unix-wordcloud`**<br><sub>[boot](previews/unix-wordcloud-boot.gif)</sub> | <img src="previews/unix-wordcloud-icons.png" width="420"> | ![](https://placehold.co/12x12/F6FFF6/F6FFF6.png) ![](https://placehold.co/12x12/9CAAA4/9CAAA4.png) ![](https://placehold.co/12x12/101410/101410.png)<br><sub>`f7fe` `9d54` `10a2`</sub> | ![](https://placehold.co/12x12/41F6A7/41F6A7.png) |
 
-| priColor | secColor | bgColor | fringe | LED |
-|---|---|---|---|---|
-| `f7d6` ![](https://placehold.co/12x12/F2F9B4/F2F9B4.png) | `a52c` ![](https://placehold.co/12x12/A0A762/A0A762.png) | `20e5` ![](https://placehold.co/12x12/211C2C/211C2C.png) | ![](https://placehold.co/12x12/C921E4/C921E4.png) `#C921E4` ![](https://placehold.co/12x12/2090E3/2090E3.png) `#2090E3` | `C921E4` |
-
-### `neon-unix-legs`
-Neon butter-yellow on near-black green, split into hot pink/teal.
-
-<img src="previews/neon-unix-legs-icons.png" width="600" alt="neon-unix-legs icons">
-
-| priColor | secColor | bgColor | fringe | LED |
-|---|---|---|---|---|
-| `fff4` ![](https://placehold.co/12x12/FEFDA6/FEFDA6.png) | `ad4a` ![](https://placehold.co/12x12/ACAA54/ACAA54.png) | `10a2` ![](https://placehold.co/12x12/131713/131713.png) | ![](https://placehold.co/12x12/FC2866/FC2866.png) `#FC2866` ![](https://placehold.co/12x12/009792/009792.png) `#009792` | `FC2866` |
-
-### `hypr-heels`
-Lavender white on deep plum, split into crimson/violet.
-
-<img src="previews/hypr-heels-icons.png" width="600" alt="hypr-heels icons">
-
-| priColor | secColor | bgColor | fringe | LED |
-|---|---|---|---|---|
-| `ff7f` ![](https://placehold.co/12x12/FBEEFF/FBEEFF.png) | `acd5` ![](https://placehold.co/12x12/A99BAD/A99BAD.png) | `1882` ![](https://placehold.co/12x12/1A1014/1A1014.png) | ![](https://placehold.co/12x12/F5003E/F5003E.png) `#F5003E` ![](https://placehold.co/12x12/A91DFE/A91DFE.png) `#A91DFE` | `F5003E` |
-
-### `omarfu`
-Mint white on charcoal, split into lime/hot pink.
-
-<img src="previews/omarfu-icons.png" width="600" alt="omarfu icons">
-
-| priColor | secColor | bgColor | fringe | LED |
-|---|---|---|---|---|
-| `e79b` ![](https://placehold.co/12x12/E4F1DE/E4F1DE.png) | `94f1` ![](https://placehold.co/12x12/929F8C/929F8C.png) | `10a2` ![](https://placehold.co/12x12/161616/161616.png) | ![](https://placehold.co/12x12/67D830/67D830.png) `#67D830` ![](https://placehold.co/12x12/E21F7C/E21F7C.png) `#E21F7C` | `67D830` |
-
-### `redflag-sword`
-Ice white on warm slate, split into signal red/steel blue.
-
-<img src="previews/redflag-sword-icons.png" width="600" alt="redflag-sword icons">
-
-| priColor | secColor | bgColor | fringe | LED |
-|---|---|---|---|---|
-| `ef9e` ![](https://placehold.co/12x12/EBF0F5/EBF0F5.png) | `9cf4` ![](https://placehold.co/12x12/989EA3/989EA3.png) | `2944` ![](https://placehold.co/12x12/2A2A25/2A2A25.png) | ![](https://placehold.co/12x12/E3020F/E3020F.png) `#E3020F` ![](https://placehold.co/12x12/3B95E3/3B95E3.png) `#3B95E3` | `E3020F` |
+> `auto-wallpaper` is Omarchy's wallust theme that re-colors itself from the current wallpaper, so its Bruce version is a snapshot.
 
 <details>
-<summary><b>Exact build commands for these themes</b></summary>
+<summary><b>Exact build commands</b></summary>
 
 ```bash
-./bruce-theme-gen.py japglitch      --fringe C921E4,2090E3 --littlefs
-./bruce-theme-gen.py neon-unix-legs --littlefs
-./bruce-theme-gen.py hypr-heels     --fringe F5003E,A91DFE --littlefs
-./bruce-theme-gen.py omarfu         --littlefs
-./bruce-theme-gen.py redflag-sword  --littlefs
+./bruce-theme-gen.py arch-mosaic          --littlefs
+./bruce-theme-gen.py arch-osi             --littlefs
+./bruce-theme-gen.py auto-wallpaper       --littlefs
+./bruce-theme-gen.py hypr-heels           --fringe F5003E,A91DFE --littlefs
+./bruce-theme-gen.py japglitch            --fringe C921E4,2090E3 --littlefs
+./bruce-theme-gen.py linux-course-glitch  --littlefs
+./bruce-theme-gen.py linux-filmstrip      --littlefs
+./bruce-theme-gen.py linux-fishnet        --littlefs
+./bruce-theme-gen.py linux-mask-glitch    --littlefs
+./bruce-theme-gen.py neon-unix-legs       --littlefs
+./bruce-theme-gen.py omarfu               --littlefs
+./bruce-theme-gen.py redflag-sword        --littlefs
+./bruce-theme-gen.py sudo-tatami          --littlefs
+./bruce-theme-gen.py tux-mosaic           --littlefs
+./bruce-theme-gen.py unix-binary          --littlefs
+./bruce-theme-gen.py unix-wordcloud       --littlefs
 ```
 </details>
 
@@ -134,6 +121,8 @@ It reads `~/.config/omarchy/themes/<name>/colors.toml` (or any file with `backgr
 | 🎞️ **Boot** | 8-frame GIF: the `BRUCE` title glitches in and settles (MrRobot font if installed). |
 | 🧾 **JSON** | Writes `<name>.json` with every menu key, border on, and the LED set to the first fringe color. |
 | 💾 **LittleFS** | Optional `--littlefs`: builds a flash image (4 KB blocks, `name_max=64`) with a preset `bruce.conf`. |
+
+After adding a theme, `./tools-gallery.py` rebuilds the gallery GIF and the theme table in this README.
 
 <details>
 <summary><b>All options</b></summary>
