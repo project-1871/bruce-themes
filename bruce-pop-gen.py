@@ -1731,6 +1731,154 @@ def adv_boot(W, H, t):
 THEMES["rad-adventure"] = (ADV, adv_icon, adv_boot)
 
 
+# ── sugar-kingdom: pink candy castle ──
+SUGAR = dict(bg="FFD1E8", text="C2185B", dim="E57BAF", led="FF4FA3",
+             candies=[("FFFFFF", "FF7AB8", "C2185B"), ("FFFFFF", "7FD7FF", "1E88C9"), ("FFFFFF", "B8F27A", "5BA82A"),
+                      ("FFFFFF", "FFD86B", "E0A000"), ("FFFFFF", "D1A8FF", "8A4FD6")],
+             sprinkles=["FF4FA3", "4FC3F7", "FFD23F", "8BD450", "B388FF", "FFFFFF"],
+             icons=icons(others=0xF011A, config=0xF01A5, interpreter=0xF095A, files=0xF082A, connect=0xF02D1, clock=0xF1970))
+
+
+def sprinkles(d, S, rnd, cols, n=14, area=None):
+    x0, y0, x1, y1 = area or (0, 0, S, S)
+    for _ in range(n):
+        x, y, a = rnd.uniform(x0, x1), rnd.uniform(y0, y1), rnd.uniform(0, math.pi)
+        dx, dy = 4 * math.cos(a), 4 * math.sin(a)
+        d.line([(x - dx, y - dy), (x + dx, y + dy)], fill=hexrgb(rnd.choice(cols)), width=3)
+
+
+def sugar_icon(key, S, t):
+    rnd = random.Random("sugar-" + key)
+    light, mid, dark = (hexrgb(c) for c in t["candies"][MENUS.index(key) % 5])
+    img = solid((S, S), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+    sprinkles(d, S, rnd, t["sprinkles"])
+    c, r = S // 2, int(S * 0.38)
+    ringm = Image.new("L", (S, S), 0); ImageDraw.Draw(ringm).ellipse([c - r, c - r, c + r, c + r], fill=255)
+    stripes = solid((S, S), (255, 255, 255)); sd = ImageDraw.Draw(stripes)
+    for k in range(-S, S * 2, 16): sd.polygon([(k, 0), (k + 8, 0), (k + 8 - S, S), (k - S, S)], fill=mid)  # candy-cane rim
+    img.paste(stripes, (0, 0), ringm)
+    inner = Image.new("L", (S, S), 0); ImageDraw.Draw(inner).ellipse([c - r + 9, c - r + 9, c + r - 9, c + r - 9], fill=255)
+    img.paste(metal((S, S), light, mid, dark), (0, 0), inner)
+    d.ellipse([c - r * 0.55, c - r * 0.78, c + r * 0.1, c - r * 0.45], fill=(255, 255, 255))  # gloss
+    m = mask_of(t, key, S, 0.36, 0.52)
+    paint(img, m.filter(ImageFilter.MaxFilter(5)), dark); paint(img, m, (255, 255, 255))
+    return img
+
+
+def sugar_boot(W, H, t):
+    f = ImageFont.truetype(str(BUBBLY), 64); f.set_variation_by_axes([700, 100])
+    s = ImageFont.truetype(str(BUBBLY), 17); s.set_variation_by_axes([700, 100])
+    pink, deep = hexrgb("FF7AB8"), hexrgb("C2185B")
+    frames = []
+    for i in range(8):
+        img = metal((W, H), hexrgb("FFE6F2"), hexrgb("FFC2DF"), hexrgb("FF9CCB")); d = ImageDraw.Draw(img)
+        rise = max(0, 4 - i) * 14
+        for x, w, h, top in ((40, 36, 54, "FF7AB8"), (100, 44, 70, "7FD7FF"), (176, 44, 70, "B8F27A"), (242, 36, 54, "FFD86B")):
+            y = 200 - h + rise
+            if y >= 196: continue  # still below ground while the castle rises
+            d.rectangle([x, y, x + w, 200], fill=(255, 240, 248), outline=deep, width=2)
+            for k in range(y + 8, 200, 12): d.line([(x, k), (x + w, k - 6)], fill=pink, width=3)   # peppermint stripes
+            d.polygon([(x - 6, y), (x + w // 2, y - 34), (x + w + 6, y)], fill=hexrgb(top), outline=deep)
+            d.ellipse([x + w // 2 - 7, y - 44, x + w // 2 + 7, y - 30], fill=(255, 255, 255), outline=deep)
+        for k, col in enumerate(("FF4FA3", "4FC3F7", "FFD23F", "8BD450", "B388FF")):  # gumdrops on the ground
+            x = 20 + k * 64
+            d.pieslice([x, 196, x + 36, 232], 180, 360, fill=hexrgb(col), outline=deep)
+        d.rectangle([0, 214, W, H], fill=(255, 240, 248))
+        sprinkles(d, W, random.Random(i // 2), t["sprinkles"], 30, (0, 216, W, H))
+        if i >= 3:
+            m = text_mask((W, H), (W // 2, 44), "BRUCE", f)
+            frost = m.filter(ImageFilter.MaxFilter(11))
+            fd = ImageDraw.Draw(frost); bb = m.getbbox()
+            for x in range(bb[0] + 8, bb[2] - 8, 22):  # frosting drips
+                ln = random.Random(x).randint(6, 20)
+                fd.rounded_rectangle([x - 4, bb[3] - 6, x + 4, bb[3] + ln], radius=4, fill=255)
+            paint(img, frost, deep, (2, 3)); paint(img, frost, (255, 255, 255)); paint(img, m, pink)
+        if i >= 6: ImageDraw.Draw(img).text((W // 2, 94), "welcome to the sugar kingdom!", font=s, fill=deep, anchor="mm")
+        frames.append(q(img, 48))
+    return frames
+
+
+# ── candy-match: glossy match-3 candies ──
+MATCH = dict(bg="3A1A6E", text="FFE14D", dim="C9A8FF", led="FF6A3D",
+             jellies=[("FF6A6A", "E0002A", "circle"), ("FFB35C", "FF6A00", "rounded"), ("FFF27A", "F2C200", "drop"),
+                      ("8BF27A", "1FAA2C", "rounded"), ("7FC8FF", "1A6FE0", "diamond"), ("E08AFF", "9A2AD6", "circle")],
+             icons=icons(others=0xF1970, interpreter=0xF095A, config=0xF04CE))
+
+
+def jelly_mask(S, shape, pad=None):
+    pad = pad if pad is not None else max(3, S // 10)
+    m = Image.new("L", (S, S), 0); d = ImageDraw.Draw(m); a, b = pad, S - pad
+    if shape == "circle": d.ellipse([a, a, b, b], fill=255)
+    elif shape == "rounded": d.rounded_rectangle([a, a, b, b], radius=S // 5, fill=255)
+    elif shape == "diamond": d.polygon([(S / 2, a - 4), (b + 4, S / 2), (S / 2, b + 4), (a - 4, S / 2)], fill=255)
+    else:  # drop
+        d.ellipse([a, a + (b - a) * 0.3, b, b], fill=255)
+        d.polygon([(S / 2, a - 2), (a + (b - a) * 0.12, a + (b - a) * 0.62), (b - (b - a) * 0.12, a + (b - a) * 0.62)], fill=255)
+    return m.filter(ImageFilter.GaussianBlur(1))
+
+
+def jelly(S, light, dark, shape):
+    m = jelly_mask(S, shape)
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    img.paste(metal((S, S), tuple(min(255, v + 60) for v in light), light, dark), (0, 0), m)
+    bb = m.getbbox()
+    hl = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    ImageDraw.Draw(hl).ellipse([bb[0] + (bb[2] - bb[0]) * 0.2, bb[1] + (bb[3] - bb[1]) * 0.12,
+                                bb[0] + (bb[2] - bb[0]) * 0.55, bb[1] + (bb[3] - bb[1]) * 0.3], fill=(255, 255, 255, 200))
+    hl.putalpha(ImageChops.multiply(hl.split()[3], m))  # keep the highlight inside the candy
+    return Image.alpha_composite(img, hl), m
+
+
+def match_icon(key, S, t):
+    light, dark, shape = t["jellies"][MENUS.index(key) % 6]
+    img = solid((S, S), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+    d.rounded_rectangle([4, 4, S - 5, S - 5], radius=14, fill=(84, 44, 150), outline=(120, 80, 200), width=3)  # board tile
+    j, m = jelly(S, hexrgb(light), hexrgb(dark), shape)
+    img.paste(solid((S, S), (30, 10, 60)), (4, 6), m)
+    img.paste(j, (0, 0), j)
+    g = mask_of(t, key, S, 0.34, 0.54)
+    paint(img, g.filter(ImageFilter.MaxFilter(5)), hexrgb(dark)); paint(img, g, (255, 255, 255))
+    return img
+
+
+def match_boot(W, H, t):
+    f = ImageFont.truetype(str(BUBBLY), 70); f.set_variation_by_axes([700, 100])
+    s = ImageFont.truetype(str(BUBBLY), 24); s.set_variation_by_axes([700, 100])
+    cell = 40; cols, rows = W // cell, H // cell
+    rnd = random.Random(7)
+    grid = [[rnd.randrange(6) for _ in range(cols)] for _ in range(rows)]
+    for x in range(1, 5): grid[2][x] = 4  # a row that matches and pops
+    sprites = {}
+    for k, (light, dark, shape) in enumerate(t["jellies"]):
+        sprites[k] = jelly(cell, hexrgb(light), hexrgb(dark), shape)[0]
+    frames = []
+    for i in range(8):
+        img = metal((W, H), hexrgb("5A2A9E"), hexrgb("3A1A6E"), hexrgb("24104A")); d = ImageDraw.Draw(img)
+        for y in range(rows):
+            for x in range(cols):
+                d.rounded_rectangle([x * cell + 2, y * cell + 2, x * cell + cell - 3, y * cell + cell - 3], radius=6, fill=(84, 44, 150))
+                popping = y == 2 and 1 <= x <= 4 and i >= 2
+                if popping and i >= 3:
+                    if i == 3: sparkle(d, x * cell + cell // 2, y * cell + cell // 2, 16, (255, 255, 255))
+                    continue
+                sp = sprites[grid[y][x]]
+                img.paste(sp, (x * cell, y * cell), sp)
+        if i >= 4:
+            m = text_mask((W, H), (W // 2, 104), "BRUCE", f)
+            paint(img, m.filter(ImageFilter.MaxFilter(13)), (120, 20, 20), (3, 5))
+            paint(img, m.filter(ImageFilter.MaxFilter(13)), (120, 20, 20))
+            img.paste(metal((W, H), hexrgb("FFF27A"), hexrgb("FFB35C"), hexrgb("FF6A00")), (0, 0), m)
+        if i >= 6:
+            d = ImageDraw.Draw(img)
+            d.text((W // 2, 170), "Sugar rush!", font=s, fill=(255, 255, 255), anchor="mm", stroke_width=4, stroke_fill=(150, 30, 120))
+        frames.append(q(img, 64))
+    return frames
+
+
+THEMES["sugar-kingdom"] = (SUGAR, sugar_icon, sugar_boot)
+THEMES["candy-match"] = (MATCH, match_icon, match_boot)
+
+
 def littlefs_image(theme_dir, name, size=0x30000, block=4096):
     """Build a LittleFS image holding the theme + a bruce.conf selecting it. Returns (bytes, used_blocks) or None if full."""
     from littlefs import LittleFS, errors

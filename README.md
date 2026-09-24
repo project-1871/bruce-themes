@@ -11,9 +11,9 @@ glitch themes generated from [Omarchy](https://omarchy.org) desktop palettes, dr
 
 <img src="previews/pop/gallery.gif" width="820" alt="Pop collection boot animations">
 
-`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `56 themes` · `each fits in 192 KB of LittleFS`
+`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `58 themes` · `each fits in 192 KB of LittleFS`
 
-**[▚ Glitch collection](#glitch-collection-16)** · **[🦇 Monster collection](#monster-collection-10)** · **[🎮 Pop collection](#pop-collection-30)** · **[Install](#install)** · **[Make your own](#generate-a-theme-from-any-omarchy-palette)**
+**[▚ Glitch collection](#glitch-collection-16)** · **[🦇 Monster collection](#monster-collection-10)** · **[🎮 Pop collection](#pop-collection-32)** · **[Install](#install)** · **[Make your own](#generate-a-theme-from-any-omarchy-palette)**
 
 </div>
 
@@ -123,7 +123,7 @@ To add a monster, add a line to `MONSTERS` in `bruce-monster-gen.py` with `(back
 
 ---
 
-## ▌Pop collection (30)
+## ▌Pop collection (32)
 
 Tributes to games, movies, cartoons and genres, each with its own art style instead of a shared effect. The build shrinks JPG quality automatically until every theme fits the CYD's 192 KB internal storage. Folder: [`pop/`](pop/).
 
@@ -159,6 +159,8 @@ Tributes to games, movies, cartoons and genres, each with its own art style inst
 | **`tiny-invader`** | alien-invader cartoons | Hot-pink alien-tech glow on a black hexagon grid | Pink circuit traces power up, then BRUCE and *ALL HAIL BRUCE* |
 | **`couch-critics`** | 90s couch-potato cartoons | Scribbly black marker outlines on flat yellow, blue, orange and green | An old wooden TV shows static, then a scribbled BRUCE and *heh heh. this rocks.* |
 | **`rad-adventure`** | candy-coloured adventure cartoons | Chunky round badges with thick navy outlines over green hills: sword, crown, candy, dog, backpack, tree, hat | BRUCE bounces in over rolling hills with a sun, clouds and a big treehouse tree, then *Mathematical!* |
+| **`sugar-kingdom`** | candy-kingdom cartoon worlds | Glossy candy balls inside candy-cane rims on pink frosting with sprinkles: ice cream, cupcake, candy, castle, heart, crown | Peppermint-striped candy towers rise over gumdrops under a frosting-dripped BRUCE: *welcome to the sugar kingdom!* |
+| **`candy-match`** | match-3 candy puzzle games | Shiny jelly candies (round, square, drop and diamond) on a purple game board | A board of candies where a row matches and pops, then chunky candy letters: BRUCE, *Sugar rush!* |
 
 <!-- pop:start -->
 | Theme | Icons | Text / dim / bg | LED |
@@ -166,6 +168,7 @@ Tributes to games, movies, cartoons and genres, each with its own art style inst
 | **`alien-arcade`**<br><sub>[boot](previews/pop/alien-arcade-boot.gif)</sub> | <img src="previews/pop/alien-arcade-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFFFF/FFFFFF.png) ![](https://placehold.co/12x12/20FF20/20FF20.png) ![](https://placehold.co/12x12/000000/000000.png)<br><sub>`ffff` `27e4` `0`</sub> | ![](https://placehold.co/12x12/20FF20/20FF20.png) |
 | **`block-craft`**<br><sub>[boot](previews/pop/block-craft-boot.gif)</sub> | <img src="previews/pop/block-craft-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFFFF/FFFFFF.png) ![](https://placehold.co/12x12/A4A1A4/A4A1A4.png) ![](https://placehold.co/12x12/292829/292829.png)<br><sub>`ffff` `a514` `2945`</sub> | ![](https://placehold.co/12x12/5FAF3F/5FAF3F.png) |
 | **`block-stack`**<br><sub>[boot](previews/pop/block-stack-boot.gif)</sub> | <img src="previews/pop/block-stack-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFFFF/FFFFFF.png) ![](https://placehold.co/12x12/00F2F6/00F2F6.png) ![](https://placehold.co/12x12/080818/080818.png)<br><sub>`ffff` `79e` `843`</sub> | ![](https://placehold.co/12x12/A000F0/A000F0.png) |
+| **`candy-match`**<br><sub>[boot](previews/pop/candy-match-boot.gif)</sub> | <img src="previews/pop/candy-match-icons.png" width="420"> | ![](https://placehold.co/12x12/FFE24A/FFE24A.png) ![](https://placehold.co/12x12/CDAAFF/CDAAFF.png) ![](https://placehold.co/12x12/39186A/39186A.png)<br><sub>`ff09` `cd5f` `38cd`</sub> | ![](https://placehold.co/12x12/FF6A3D/FF6A3D.png) |
 | **`code-rain`**<br><sub>[boot](previews/pop/code-rain-boot.gif)</sub> | <img src="previews/pop/code-rain-icons.png" width="420"> | ![](https://placehold.co/12x12/00FF41/00FF41.png) ![](https://placehold.co/12x12/008D10/008D10.png) ![](https://placehold.co/12x12/000000/000000.png)<br><sub>`7e8` `462` `0`</sub> | ![](https://placehold.co/12x12/00FF41/00FF41.png) |
 | **`comic-hero`**<br><sub>[boot](previews/pop/comic-hero-boot.gif)</sub> | <img src="previews/pop/comic-hero-icons.png" width="420"> | ![](https://placehold.co/12x12/101010/101010.png) ![](https://placehold.co/12x12/8B694A/8B694A.png) ![](https://placehold.co/12x12/FFF6D5/FFF6D5.png)<br><sub>`1082` `8b49` `ffba`</sub> | ![](https://placehold.co/12x12/E23636/E23636.png) |
 | **`couch-critics`**<br><sub>[boot](previews/pop/couch-critics-boot.gif)</sub> | <img src="previews/pop/couch-critics-icons.png" width="420"> | ![](https://placehold.co/12x12/FFE24A/FFE24A.png) ![](https://placehold.co/12x12/8BA5FF/8BA5FF.png) ![](https://placehold.co/12x12/18286A/18286A.png)<br><sub>`ff09` `8d3f` `194d`</sub> | ![](https://placehold.co/12x12/FFE14D/FFE14D.png) |
@@ -186,6 +189,7 @@ Tributes to games, movies, cartoons and genres, each with its own art style inst
 | **`speed-rings`**<br><sub>[boot](previews/pop/speed-rings-boot.gif)</sub> | <img src="previews/pop/speed-rings-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFFFF/FFFFFF.png) ![](https://placehold.co/12x12/FFD600/FFD600.png) ![](https://placehold.co/12x12/08289C/08289C.png)<br><sub>`ffff` `fea0` `953`</sub> | ![](https://placehold.co/12x12/1E6BFF/1E6BFF.png) |
 | **`starship-panel`**<br><sub>[boot](previews/pop/starship-panel-boot.gif)</sub> | <img src="previews/pop/starship-panel-icons.png" width="420"> | ![](https://placehold.co/12x12/FF9D00/FF9D00.png) ![](https://placehold.co/12x12/CD99CD/CD99CD.png) ![](https://placehold.co/12x12/000000/000000.png)<br><sub>`fce0` `ccd9` `0`</sub> | ![](https://placehold.co/12x12/FF9C00/FF9C00.png) |
 | **`steampunk`**<br><sub>[boot](previews/pop/steampunk-boot.gif)</sub> | <img src="previews/pop/steampunk-icons.png" width="420"> | ![](https://placehold.co/12x12/EEC273/EEC273.png) ![](https://placehold.co/12x12/8B6939/8B6939.png) ![](https://placehold.co/12x12/181408/181408.png)<br><sub>`ee0e` `8b47` `18a1`</sub> | ![](https://placehold.co/12x12/D4892A/D4892A.png) |
+| **`sugar-kingdom`**<br><sub>[boot](previews/pop/sugar-kingdom-boot.gif)</sub> | <img src="previews/pop/sugar-kingdom-icons.png" width="420"> | ![](https://placehold.co/12x12/C5185A/C5185A.png) ![](https://placehold.co/12x12/E679AC/E679AC.png) ![](https://placehold.co/12x12/FFD2EE/FFD2EE.png)<br><sub>`c0cb` `e3d5` `fe9d`</sub> | ![](https://placehold.co/12x12/FF4FA3/FF4FA3.png) |
 | **`time-circuits`**<br><sub>[boot](previews/pop/time-circuits-boot.gif)</sub> | <img src="previews/pop/time-circuits-icons.png" width="420"> | ![](https://placehold.co/12x12/FF3031/FF3031.png) ![](https://placehold.co/12x12/31FF62/31FF62.png) ![](https://placehold.co/12x12/181C18/181C18.png)<br><sub>`f986` `37ec` `18e3`</sub> | ![](https://placehold.co/12x12/FFB000/FFB000.png) |
 | **`tiny-invader`**<br><sub>[boot](previews/pop/tiny-invader-boot.gif)</sub> | <img src="previews/pop/tiny-invader-icons.png" width="420"> | ![](https://placehold.co/12x12/FF2C9C/FF2C9C.png) ![](https://placehold.co/12x12/8B286A/8B286A.png) ![](https://placehold.co/12x12/080008/080008.png)<br><sub>`f973` `894d` `801`</sub> | ![](https://placehold.co/12x12/FF2E9E/FF2E9E.png) |
 | **`vector-rocks`**<br><sub>[boot](previews/pop/vector-rocks-boot.gif)</sub> | <img src="previews/pop/vector-rocks-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFFFF/FFFFFF.png) ![](https://placehold.co/12x12/838183/838183.png) ![](https://placehold.co/12x12/000000/000000.png)<br><sub>`ffff` `8410` `0`</sub> | ![](https://placehold.co/12x12/FFFFFF/FFFFFF.png) |
