@@ -6,6 +6,7 @@
 generated straight from [Omarchy](https://omarchy.org) desktop color palettes.**
 
 <img src="previews/japglitch-boot.gif" width="320" alt="Japglitch boot animation">&nbsp;&nbsp;<img src="previews/neon-unix-legs-boot.gif" width="320" alt="Neon Unix Legs boot animation">
+<br><img src="previews/hypr-heels-boot.gif" width="320" alt="Hypr Heels boot animation">
 
 `320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `fits in 192 KB of LittleFS`
 
@@ -32,6 +33,25 @@ Neon butter-yellow on near-black green, split into hot pink/teal.
 | priColor | secColor | bgColor | fringe | LED |
 |---|---|---|---|---|
 | `fff4` ![](https://placehold.co/12x12/FEFDA6/FEFDA6.png) | `ad4a` ![](https://placehold.co/12x12/ACAA54/ACAA54.png) | `10a2` ![](https://placehold.co/12x12/131713/131713.png) | ![](https://placehold.co/12x12/FC2866/FC2866.png) `#FC2866` ![](https://placehold.co/12x12/009792/009792.png) `#009792` | `FC2866` |
+
+### `hypr-heels`
+Lavender white on deep plum, split into crimson/violet.
+
+<img src="previews/hypr-heels-icons.png" width="600" alt="hypr-heels icons">
+
+| priColor | secColor | bgColor | fringe | LED |
+|---|---|---|---|---|
+| `ff7f` ![](https://placehold.co/12x12/FBEEFF/FBEEFF.png) | `acd5` ![](https://placehold.co/12x12/A99BAD/A99BAD.png) | `1882` ![](https://placehold.co/12x12/1A1014/1A1014.png) | ![](https://placehold.co/12x12/F5003E/F5003E.png) `#F5003E` ![](https://placehold.co/12x12/A91DFE/A91DFE.png) `#A91DFE` | `F5003E` |
+
+<details>
+<summary><b>Exact build commands for these three</b></summary>
+
+```bash
+./bruce-theme-gen.py japglitch      --fringe C921E4,2090E3 --littlefs
+./bruce-theme-gen.py neon-unix-legs --littlefs
+./bruce-theme-gen.py hypr-heels     --fringe F5003E,A91DFE --littlefs
+```
+</details>
 
 ---
 
