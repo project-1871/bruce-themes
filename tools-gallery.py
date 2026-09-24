@@ -56,7 +56,7 @@ def replace(readme, tag, body):
 glitch, monster, pop = names_in("themes"), names_in("monster"), names_in("pop")
 gallery(glitch, ROOT / "previews", ROOT / "previews" / "gallery.gif")
 gallery(monster, ROOT / "previews" / "monster", ROOT / "previews" / "monster" / "gallery.gif", cols=5, tw=160, th=120)
-gallery(pop, ROOT / "previews" / "pop", ROOT / "previews" / "pop" / "gallery.gif")
+gallery(pop, ROOT / "previews" / "pop", ROOT / "previews" / "pop" / "gallery.gif", cols=6, tw=134, th=100)
 
 build = "\n".join(f"./bruce-theme-gen.py {n:<20}" + (f" --fringe {FRINGE[n]}" if n in FRINGE else "") + " --littlefs"
                   for n in glitch)

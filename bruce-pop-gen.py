@@ -688,20 +688,1016 @@ THEMES = {
 }
 
 
-def build_littlefs(theme_dir, name, out, size=0x30000, block=4096):
-    from littlefs import LittleFS
+# ═════════════════════════ retro games & movies (batch 2) ═════════════════════════
+from PIL import ImageChops
+import math
+
+BASE = {"wifi": 0xF05A9, "ble": 0xF00AF, "rf": 0xF043B, "rfid": 0xF0396, "fm": 0xF0439, "ir": 0xF0454,
+        "files": 0xF024B, "gps": 0xF01A4, "nrf": 0xF0003, "interpreter": 0xF0169, "clock": 0xF0150,
+        "lora": 0xF1119, "others": 0xF15FC, "connect": 0xF0318, "config": 0xF0493}
+
+
+def icons(**over):
+    d = dict(BASE); d.update(over); return d
+
+
+def F(name): return ROOT / "fonts" / name
+
+
+def vfont(path, size, wght=None):
+    f = ImageFont.truetype(str(path), size)
+    if wght:
+        try: f.set_variation_by_axes([wght])
+        except Exception: pass
+    return f
+
+
+MRROBOT = Path.home() / ".local/share/fonts/MrRobot.ttf"
+
+
+def title_font(size):
+    return ImageFont.truetype(str(MRROBOT if MRROBOT.exists() else F("Orbitron.ttf")), size)
+
+
+def mask_of(t, key, S, scale=0.58, yfrac=0.5):
+    return glyph_mask(t["icons"][key], int(S * scale), S, yfrac=yfrac)
+
+
+def paint(img, mask, color, off=(0, 0)):
+    img.paste(solid(img.size, color), off, mask)
+
+
+def glowm(mask, r, k=2.0):
+    return mask.filter(ImageFilter.GaussianBlur(r)).point(lambda v: min(255, int(v * k)))
+
+
+def ring(mask, w=7):
+    return ImageChops.subtract(mask.filter(ImageFilter.MaxFilter(w)), mask)
+
+
+def text_mask(size, xy, text, font, anchor="mm"):
+    m = Image.new("L", size, 0)
+    ImageDraw.Draw(m).text(xy, text, font=font, fill=255, anchor=anchor)
+    return m
+
+
+def cycle(t, key, name="colors"):
+    return hexrgb(t[name][MENUS.index(key) % len(t[name])])
+
+
+def q(img, n): return img.quantize(n, dither=Image.Dither.NONE)
+
+
+# ── 1 maze-chomper ──
+MAZE = dict(bg="000000", text="FFE000", dim="2121DE", led="FFE000", grid=24,
+            colors=["FFE000", "FF0000", "FFB8FF", "00FFFF", "FFB852"], icons=icons(others=0xF02A0))
+
+
+def maze_icon(key, S, t):
+    img = solid((S, S), (0, 0, 0)); d = ImageDraw.Draw(img)
+    blue = hexrgb("2121DE")
+    d.rounded_rectangle([4, 4, S - 5, S - 5], radius=14, outline=blue, width=3)
+    d.rounded_rectangle([11, 11, S - 12, S - 12], radius=9, outline=blue, width=3)
+    for x in range(24, S - 20, 14): d.rectangle([x, S - 22, x + 3, S - 19], fill=hexrgb("FFB8AE"))
+    g = t["grid"]; col = cycle(t, key)
+    spr = sprite(pixelate(mask_of(t, key, S, 0.52, 0.45), g), col, col, (0, 0, 0), g).resize((S, S), Image.NEAREST)
+    img.paste(spr, (0, 0), spr)
+    return img
+
+
+def maze_boot(W, H, t):
+    f = ImageFont.truetype(str(PIXEL), 36); small = ImageFont.truetype(str(PIXEL), 10)
+    blue, yellow = hexrgb("2121DE"), hexrgb("FFE000")
+    frames = []
+    for i in range(8):
+        img = solid((W, H), (0, 0, 0)); d = ImageDraw.Draw(img)
+        for inset in (6, 14): d.rounded_rectangle([inset, inset, W - 1 - inset, H - 1 - inset], radius=18, outline=blue, width=3)
+        d.text((W // 2, 70), "BRUCE", font=f, fill=yellow, anchor="mm")
+        px = 30 + i * 34
+        for x in range(40, W - 30, 20):
+            if x > px + 10: d.rectangle([x, 148, x + 4, 152], fill=hexrgb("FFB8AE"))
+        mouth = 35 if i % 2 == 0 else 5
+        d.pieslice([px - 16, 134, px + 16, 166], mouth, 360 - mouth, fill=yellow)
+        for k, col in enumerate(("FF0000", "FFB8FF")):  # chasing ghosts
+            gx = px - 60 - k * 40
+            if gx > 10:
+                gm = glyph_mask(0xF02A0, 34, 40)
+                img.paste(solid((40, 40), hexrgb(col)), (gx - 20, 130), gm)
+        if i >= 5: d.text((W // 2, 200), "READY!", font=small, fill=yellow, anchor="mm")
+        frames.append(q(img, 8))
+    return frames
+
+
+# ── 2 block-stack ──
+STACK = dict(bg="0A0A1A", text="FFFFFF", dim="00F0F0", led="A000F0", grid=13,
+             colors=["00F0F0", "F0F000", "A000F0", "00F000", "F00000", "3060FF", "F0A000"], icons=icons())
+
+
+def bevel_cell(d, x, y, c, col):
+    light = tuple(min(255, v + 90) for v in col); dark = tuple(v // 2 for v in col)
+    d.rectangle([x, y, x + c - 1, y + c - 1], fill=col)
+    d.polygon([(x, y), (x + c - 1, y), (x + c - 4, y + 3), (x + 3, y + 3), (x + 3, y + c - 4), (x, y + c - 1)], fill=light)
+    d.polygon([(x + c - 1, y), (x + c - 1, y + c - 1), (x, y + c - 1), (x + 3, y + c - 4), (x + c - 4, y + c - 4), (x + c - 4, y + 3)], fill=dark)
+
+
+def stack_icon(key, S, t):
+    img = solid((S, S), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+    g = t["grid"]; c = S // g; off = (S - c * g) // 2
+    for k in range(g + 1):
+        d.line([(off + k * c, off), (off + k * c, off + g * c)], fill=(24, 24, 40))
+        d.line([(off, off + k * c), (off + g * c, off + k * c)], fill=(24, 24, 40))
+    cells = pixelate(mask_of(t, key, S, 0.66), g); col = cycle(t, key)
+    for y in range(g):
+        for x in range(g):
+            if cells[y][x]: bevel_cell(d, off + x * c, off + y * c, c, col)
+    return img
+
+
+def stack_boot(W, H, t):
+    c = 6; cols, rows = W // c, H // c
+    m = text_mask((cols, rows), (cols // 2, rows // 2 - 4), "BRUCE", ImageFont.truetype(str(PIXEL), 8))
+    px = m.load()
+    on = [(x, y) for y in range(rows) for x in range(cols) if px[x, y] > 100]
+    x0 = min(x for x, _ in on)
+    colors = [hexrgb(x) for x in t["colors"]]
+    frames = []
+    for i in range(9):
+        img = solid((W, H), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+        for x in range(0, W, c * 2): d.line([(x, 0), (x, H)], fill=(18, 18, 32))
+        for y in range(0, H, c * 2): d.line([(0, y), (W, y)], fill=(18, 18, 32))
+        for x, y in on:
+            li = (x - x0) // 8  # which letter
+            drop = max(0, li + 2 - i) * 7  # letters fall in one after another and land
+            if i >= li: bevel_cell(d, x * c, (y - drop) * c, c, colors[li % len(colors)])
+        base = rows - 4  # a full line at the bottom flashes and clears
+        if i < 8:
+            for x in range(cols): bevel_cell(d, x * c, base * c, c, (255, 255, 255) if i >= 7 else colors[(x // 5) % len(colors)])
+        frames.append(q(img, 32))
+    return frames
+
+
+# ── 3 block-craft ──
+CRAFT = dict(bg="2B2B2B", text="FFFFFF", dim="A0A0A0", led="5FAF3F", grid=22,
+             colors=["4AEDD9", "FCEE4B", "D8D8D8", "FF3030", "17DD62"],
+             tiles=[["866043", "7A5638", "96704F", "6C4C30"], ["7F7F7F", "747474", "8F8F8F", "6A6A6A"],
+                    ["A0824E", "8E7244", "B08F57", "7D6440"]],
+             icons=icons(files=0xF0726, config=0xF08B7, others=0xF04E5))
+
+
+def craft_icon(key, S, t):
+    rnd = random.Random("craft-" + key)
+    shades = [hexrgb(x) for x in t["tiles"][MENUS.index(key) % 3]]
+    img = solid((S, S), shades[0]); d = ImageDraw.Draw(img)
+    c = S / 16
+    for y in range(16):
+        for x in range(16):
+            d.rectangle([int(x * c), int(y * c), int((x + 1) * c) - 1, int((y + 1) * c) - 1], fill=rnd.choice(shades))
+    if MENUS.index(key) % 3 == 0:  # grass top on dirt blocks
+        for x in range(16):
+            h = rnd.randint(2, 4)
+            d.rectangle([int(x * c), 0, int((x + 1) * c) - 1, int(h * c) - 1], fill=rnd.choice([(95, 159, 53), (84, 140, 47), (110, 176, 64)]))
+    g = t["grid"]; col = cycle(t, key)
+    cells = pixelate(mask_of(t, key, S, 0.6, 0.52), g)
+    spr = sprite(cells, col, tuple(min(255, v + 60) for v in col), (20, 20, 20), g).resize((S, S), Image.NEAREST)
+    shadow = Image.new("L", (S, S), 0); shadow.paste(spr.split()[3], (6, 6))
+    img.paste(solid((S, S), (30, 24, 18)), (0, 0), shadow)
+    img.paste(spr, (0, 0), spr)
+    return img
+
+
+def craft_boot(W, H, t):
+    f = ImageFont.truetype(str(PIXEL), 40); sp = ImageFont.truetype(str(PIXEL), 10)
+    rnd = random.Random(4)
+    ground = [[rnd.choice(["866043", "7A5638", "96704F"]) for _ in range(W // 10)] for _ in range(6)]
+    frames = []
+    for i in range(8):
+        img = solid((W, H), hexrgb("7EB3FF")); d = ImageDraw.Draw(img)
+        for gy, row in enumerate(ground):
+            for gx, col in enumerate(row):
+                fill = (95, 159, 53) if gy == 0 else hexrgb(col)
+                d.rectangle([gx * 10, 180 + gy * 10, gx * 10 + 9, 180 + gy * 10 + 9], fill=fill)
+        for gx in range(0, W // 10, 6):  # blocks stacking up
+            h = min(i, 3 + (gx // 6) % 3)
+            for k in range(h): d.rectangle([gx * 10, 170 - k * 10, gx * 10 + 9, 179 - k * 10], fill=hexrgb("7F7F7F"), outline=hexrgb("5A5A5A"))
+        for dz in range(6, 0, -1): d.text((W // 2 + dz, 78 + dz), "BRUCE", font=f, fill=(60, 60, 60), anchor="mm")
+        d.text((W // 2, 78), "BRUCE", font=f, fill=(200, 200, 200), anchor="mm")
+        if i >= 4:
+            s = 1.0 + (0.12 if i % 2 else 0)
+            spl = Image.new("L", (160, 30), 0)
+            ImageDraw.Draw(spl).text((80, 15), "Now with WiFi!", font=ImageFont.truetype(str(PIXEL), int(9 * s)), fill=255, anchor="mm")
+            spl = spl.rotate(18, expand=True)
+            img.paste(solid(spl.size, (255, 255, 0)), (W - spl.width - 6, 96), spl)
+        frames.append(q(img, 24))
+    return frames
+
+
+# ── 4 wasteland-terminal / 14 magic-word helpers: CRT phosphor ──
+WASTE = dict(bg="031A08", text="1AFF80", dim="0E8A45", led="1AFF80", phos="1AFF80",
+             icons=icons(others=0xF043C, gps=0xF034D, interpreter=0xF018D))
+
+
+def phosphor_icon(key, S, t):
+    bg, ph = hexrgb(t["bg"]), hexrgb(t["phos"])
+    img = solid((S, S), bg)
+    m = mask_of(t, key, S, 0.56)
+    paint(img, glowm(m, 6, 1.4), tuple(v // 3 for v in ph))
+    paint(img, m, ph)
+    d = ImageDraw.Draw(img); L = 16
+    for (x, y, dx, dy) in ((6, 6, 1, 1), (S - 7, 6, -1, 1), (6, S - 7, 1, -1), (S - 7, S - 7, -1, -1)):
+        d.line([(x, y), (x + dx * L, y)], fill=ph, width=2); d.line([(x, y), (x, y + dy * L)], fill=ph, width=2)
+    return scanlines(img, 3, 0.78)
+
+
+def terminal_boot(W, H, t, lines, final=None):
+    f = ImageFont.truetype(str(F("VT323.ttf")), 22)
+    bg, ph = hexrgb(t["bg"]), hexrgb(t["phos"])
+    total = sum(len(s) for s in lines); frames = []
+    for i in range(8):
+        img = solid((W, H), bg); d = ImageDraw.Draw(img)
+        budget = int(total * min(1, (i + 1) / 6)); y = 16
+        for s in lines:
+            shown = s[:max(0, budget)]; budget -= len(s)
+            d.text((14, y), shown, font=f, fill=ph); y += 24
+        if budget >= 0 and i % 2 == 0: d.rectangle([14, y + 2, 26, y + 20], fill=ph)  # cursor
+        if final and i >= 6: final(img, d)
+        img = Image.composite(img, solid((W, H), bg), glowm(Image.new("L", (W, H), 255), 0))
+        frames.append(q(scanlines(img, 3, 0.75), 12))
+    return frames
+
+
+def waste_boot(W, H, t):
+    def thumbs(img, d):
+        m = glyph_mask(0xF0513, 70, 90)
+        img.paste(solid((90, 90), hexrgb(t["phos"])), (W - 104, H - 104), m)
+    return terminal_boot(W, H, t, ["BRUCE INDUSTRIES UNIFIED OS", "COPYRIGHT 2075-2077", "- SERVER 1 -", "",
+                                   "> LOGON ADMIN", "PASSWORD: ********", "", "WELCOME, OVERSEER."], thumbs)
+
+
+# ── 5 versus-fighter ──
+FIGHT = dict(bg="120000", text="FFD000", dim="B03020", led="FF3000",
+             icons=icons(others=0xF0B65, config=0xF082C, rf=0xF0238))
+
+
+def fighter_icon(key, S, t):
+    img = solid((S, S), (14, 0, 0)); d = ImageDraw.Draw(img)
+    for k in range(-2, 6):
+        x = k * 34
+        d.polygon([(x, S), (x + 16, S), (x + 16 + S, 0), (x + S, 0)], fill=(70, 6, 6))
+    m = mask_of(t, key, S, 0.58)
+    paint(img, m.filter(ImageFilter.MaxFilter(9)), (0, 0, 0), (4, 5))
+    paint(img, m.filter(ImageFilter.MaxFilter(9)), (0, 0, 0))
+    img.paste(metal((S, S), hexrgb("FFF200"), hexrgb("FF8C00"), hexrgb("C00000")), (0, 0), m)
+    return img
+
+
+def fighter_boot(W, H, t):
+    big = ImageFont.truetype(str(F("Bangers-Regular.ttf")), 64); mid = ImageFont.truetype(str(F("Bangers-Regular.ttf")), 34)
+    fire = metal((W, H), hexrgb("FFF200"), hexrgb("FF8C00"), hexrgb("C00000"))
+    frames = []
+    for i in range(8):
+        img = solid((W, H), (0, 0, 0)); d = ImageDraw.Draw(img)
+        d.polygon([(0, 0), (W // 2 + 30, 0), (W // 2 - 30, H), (0, H)], fill=(150, 20, 20))
+        d.polygon([(W // 2 + 30, 0), (W, 0), (W, H), (W // 2 - 30, H)], fill=(20, 40, 150))
+        slide = max(0, 3 - i) * 50
+        d.text((80 - slide, 60), "BRUCE", font=mid, fill=(255, 255, 255), anchor="mm", stroke_width=3, stroke_fill=(0, 0, 0))
+        d.text((W - 80 + slide, 60), "CYD", font=mid, fill=(255, 255, 255), anchor="mm", stroke_width=3, stroke_fill=(0, 0, 0))
+        word = "VS" if i < 5 else ("ROUND 1" if i < 6 else "FIGHT!")
+        if i >= 2:
+            m = text_mask((W, H), (W // 2, 140), word, big)
+            paint(img, m.filter(ImageFilter.MaxFilter(9)), (0, 0, 0))
+            img.paste(fire, (0, 0), m)
+        frames.append(q(img, 32))
+    return frames
+
+
+# ── 6 soul-battle ──
+SOUL = dict(bg="000000", text="FFFFFF", dim="FF8C00", led="FF0000", grid=24, icons=icons(others=0xF02D1))
+HEART = [".XX.XX.", "XXXXXXX", "XXXXXXX", ".XXXXX.", "..XXX..", "...X..."]
+
+
+def soul_icon(key, S, t):
+    img = solid((S, S), (0, 0, 0)); d = ImageDraw.Draw(img)
+    d.rectangle([6, 6, S - 7, S - 7], outline=(255, 255, 255), width=4)
+    g = t["grid"]
+    spr = sprite(pixelate(mask_of(t, key, S, 0.5, 0.47), g), (255, 255, 255), (255, 255, 255), (0, 0, 0), g).resize((S, S), Image.NEAREST)
+    img.paste(spr, (0, 0), spr)
+    draw_bits(d, HEART, S - 30, S - 26, 2, (255, 0, 0))
+    return img
+
+
+def soul_boot(W, H, t):
+    f = ImageFont.truetype(str(PIXEL), 10); b = ImageFont.truetype(str(PIXEL), 9)
+    msg = "* BRUCE blocks the way!"
+    frames = []
+    for i in range(8):
+        img = solid((W, H), (0, 0, 0)); d = ImageDraw.Draw(img)
+        d.rectangle([20, 110, W - 21, 190], outline=(255, 255, 255), width=4)
+        d.text((34, 126), msg[:min(len(msg), (i + 1) * 4)], font=f, fill=(255, 255, 255))
+        hx = 150 + int(18 * math.sin(i))
+        draw_bits(d, HEART, hx, 160, 3, (255, 0, 0))
+        big = ImageFont.truetype(str(PIXEL), 34)
+        d.text((W // 2, 50), "BRUCE", font=big, fill=(255, 255, 255), anchor="mm")
+        for k, word in enumerate(("FIGHT", "ACT", "ITEM", "SPARE")):
+            x = 14 + k * 76
+            sel = k == (i // 2) % 4
+            d.rectangle([x, 204, x + 66, 230], outline=hexrgb("FF8C00") if not sel else (255, 255, 0), width=2)
+            d.text((x + 33, 217), word, font=b, fill=hexrgb("FF8C00") if not sel else (255, 255, 0), anchor="mm")
+        frames.append(q(img, 8))
+    return frames
+
+
+# ── 7 vector-rocks ──
+VECTOR = dict(bg="000000", text="FFFFFF", dim="808080", led="FFFFFF", icons=icons(others=0xF0463, nrf=0xF0629))
+
+
+def rock_poly(cx, cy, r, rnd, n=9):
+    return [(cx + r * rnd.uniform(0.7, 1.0) * math.cos(k * 2 * math.pi / n), cy + r * rnd.uniform(0.7, 1.0) * math.sin(k * 2 * math.pi / n)) for k in range(n)]
+
+
+def vector_icon(key, S, t):
+    rnd = random.Random("vec-" + key)
+    img = solid((S, S), (0, 0, 0)); d = ImageDraw.Draw(img)
+    for _ in range(6): d.point((rnd.randrange(S), rnd.randrange(S)), fill=(160, 160, 160))
+    m = mask_of(t, key, S, 0.6)
+    paint(img, ring(m, 5), (255, 255, 255))
+    return img
+
+
+def vector_boot(W, H, t):
+    f = ImageFont.truetype(str(PIXEL), 38); s = ImageFont.truetype(str(PIXEL), 10)
+    rnd = random.Random(2)
+    rocks = [(rnd.randrange(W), rnd.randrange(60, H), rnd.randint(12, 28), rnd.uniform(-6, 6), rnd.uniform(-4, 4), random.Random(k)) for k in range(7)]
+    frames = []
+    for i in range(8):
+        img = solid((W, H), (0, 0, 0)); d = ImageDraw.Draw(img)
+        d.text((12, 10), "%05d" % (i * 250), font=s, fill=(255, 255, 255))
+        tm = text_mask((W, H), (W // 2, 56), "BRUCE", f)
+        paint(img, ring(tm, 3), (255, 255, 255))
+        for x, y, r, vx, vy, pr in rocks:
+            pts = rock_poly((x + vx * i) % W, (y + vy * i) % H, r, random.Random(pr.random()))
+            d.polygon(pts, outline=(255, 255, 255))
+        a = i * 0.5
+        cx, cy = W // 2, 160
+        ship = [(cx + 14 * math.cos(a), cy + 14 * math.sin(a)), (cx + 10 * math.cos(a + 2.5), cy + 10 * math.sin(a + 2.5)),
+                (cx + 4 * math.cos(a + math.pi), cy + 4 * math.sin(a + math.pi)), (cx + 10 * math.cos(a - 2.5), cy + 10 * math.sin(a - 2.5))]
+        d.polygon(ship, outline=(255, 255, 255))
+        for k in range(1, 3): d.point((cx + (14 + k * 14) * math.cos(a), cy + (14 + k * 14) * math.sin(a)), fill=(255, 255, 255))
+        frames.append(q(img, 4))
+    return frames
+
+
+# ── 8 speed-rings ──
+SPEED = dict(bg="0B2A9E", text="FFFFFF", dim="FFD700", led="1E6BFF", icons=icons(others=0xF046E, rf=0xF140B))
+
+
+def speed_icon(key, S, t):
+    rnd = random.Random("spd-" + key)
+    img = metal((S, S), hexrgb("3D8BFF"), hexrgb("1447D6"), hexrgb("0A1A6F")); d = ImageDraw.Draw(img)
+    for _ in range(7):
+        y = rnd.randrange(8, S - 8); x = rnd.randrange(-20, S // 2)
+        d.line([(x, y), (x + rnd.randint(30, 70), y)], fill=(170, 200, 255), width=2)
+    c, r = S // 2, int(S * 0.36)
+    d.ellipse([c - r, c - r, c + r, c + r], outline=hexrgb("B8860B"), width=9)
+    d.ellipse([c - r + 1, c - r + 1, c + r - 1, c + r - 1], outline=hexrgb("FFD700"), width=5)
+    m = mask_of(t, key, S, 0.46)
+    paint(img, m.filter(ImageFilter.MaxFilter(7)), hexrgb("0A1A6F"))
+    paint(img, m, (255, 255, 255))
+    return img
+
+
+def speed_boot(W, H, t):
+    f = ImageFont.truetype(str(F("Bangers-Regular.ttf")), 84)
+    rnd = random.Random(9)
+    lines = [(rnd.randrange(H), rnd.randint(40, 140)) for _ in range(18)]
+    frames = []
+    for i in range(8):
+        img = metal((W, H), hexrgb("3D8BFF"), hexrgb("1447D6"), hexrgb("0A1A6F")); d = ImageDraw.Draw(img)
+        for k, (y, L) in enumerate(lines):
+            x = (k * 37 - i * 60) % (W + L) - L
+            d.line([(x, y), (x + L, y)], fill=(170, 200, 255), width=2)
+        for k in range(5):  # spinning rings (ellipse width = rotation)
+            cx, w = 40 + k * 60, abs(int(14 * math.cos(i * 0.8 + k)))
+            d.ellipse([cx - w - 2, 190, cx + w + 2, 222], outline=hexrgb("FFD700"), width=4)
+        x = W // 2 + max(0, 4 - i) * 70
+        m = text_mask((W, H), (x, 100), "BRUCE", f)
+        m = m.transform((W, H), Image.AFFINE, (1, 0.25, -25, 0, 1, 0))  # italic lean
+        paint(img, m.filter(ImageFilter.MaxFilter(9)), hexrgb("0A1A6F"), (4, 5))
+        paint(img, m.filter(ImageFilter.MaxFilter(9)), hexrgb("0A1A6F"))
+        paint(img, m, (255, 255, 255))
+        frames.append(q(img, 32))
+    return frames
+
+
+# ── 9 hacker-mask ──
+HACKER = dict(bg="000000", text="FFFFFF", dim="C8102E", led="C8102E",
+              icons=icons(others=0xF05F9, interpreter=0xF018D, config=0xF00E4))
+
+
+def brush(d, box, rnd, col):
+    x0, y0, x1, y1 = box; pts = []
+    for k in range(14): pts.append((x0 + (x1 - x0) * k / 13, y0 + rnd.randint(-6, 6)))
+    for k in range(14): pts.append((x1 - (x1 - x0) * k / 13, y1 + rnd.randint(-6, 6)))
+    d.polygon(pts, fill=col)
+
+
+def hacker_icon(key, S, t):
+    rnd = random.Random("hk-" + key)
+    img = solid((S, S), (0, 0, 0)); d = ImageDraw.Draw(img)
+    brush(d, (14, 28, S - 14, S - 28), rnd, hexrgb("C8102E"))
+    m = mask_of(t, key, S, 0.5)
+    paint(img, m.filter(ImageFilter.MaxFilter(5)), (0, 0, 0))
+    paint(img, m, (255, 255, 255))
+    d.text((8, S - 20), ">_", font=ImageFont.truetype(str(F("VT323.ttf")), 18), fill=(255, 255, 255))
+    return img
+
+
+def hacker_boot(W, H, t):
+    tf = title_font(56); f = ImageFont.truetype(str(F("VT323.ttf")), 24)
+    rnd = random.Random(13)
+    msg = "hello, friend."
+    mask = glyph_mask(0xF05F9, 90, 110)
+    frames = []
+    for i in range(8):
+        img = solid((W, H), (0, 0, 0)); d = ImageDraw.Draw(img)
+        brush(d, (40, 90, W - 40, 150), random.Random(3), hexrgb("C8102E"))
+        d.text((W // 2, 120), "BRUCE", font=tf, fill=(255, 255, 255), anchor="mm")
+        img.paste(solid((110, 110), (255, 255, 255)), (W // 2 - 55, -18), mask)
+        d.text((W // 2, 196), msg[:i * 3], font=f, fill=(255, 255, 255), anchor="mm")
+        if i < 4:  # glitch slices while it boots
+            for _ in range(4 - i):
+                y, h = rnd.randrange(H - 10), rnd.randint(3, 14)
+                img.paste(img.crop((0, y, W, y + h)), (rnd.randint(-30, 30), y))
+        frames.append(q(img, 8))
+    return frames
+
+
+# ── 10 starship-panel ──
+PANEL = dict(bg="000000", text="FF9C00", dim="CC99CC", led="FF9C00",
+             colors=["FF9C00", "CC99CC", "9999FF", "FFCC99", "CC6666", "99CCFF"],
+             icons=icons(others=0xF0463, nrf=0xF0768, interpreter=0xF018D))
+
+
+def panel_icon(key, S, t):
+    idx = MENUS.index(key)
+    a, b = hexrgb(t["colors"][idx % 6]), hexrgb(t["colors"][(idx + 2) % 6])
+    img = solid((S, S), (0, 0, 0)); d = ImageDraw.Draw(img)
+    d.rounded_rectangle([4, 4, S - 4, 26], radius=11, fill=a)            # top bar
+    d.rounded_rectangle([4, 4, 26, S - 4], radius=11, fill=a)            # side bar (elbow)
+    d.rounded_rectangle([22, 22, 40, 40], radius=9, fill=(0, 0, 0))
+    d.rectangle([4, 60, 26, 64], fill=(0, 0, 0))
+    d.text((S - 8, 16), "%02d-%d" % (idx + 1, 4700 + idx * 13), font=vfont(F("Antonio.ttf"), 14, 700), fill=(0, 0, 0), anchor="rm")
+    m = glyph_mask(t["icons"][key], int(S * 0.46), S, yfrac=0.58)
+    img.paste(solid((S, S), b), (10, 4), m)
+    return img
+
+
+def panel_boot(W, H, t):
+    f = vfont(F("Antonio.ttf"), 48, 700); s = vfont(F("Antonio.ttf"), 14, 700)
+    cols = [hexrgb(x) for x in t["colors"]]
+    frames = []
+    for i in range(8):
+        img = solid((W, H), (0, 0, 0)); d = ImageDraw.Draw(img)
+        d.rounded_rectangle([6, 6, 120, 40], radius=17, fill=cols[0]); d.rectangle([60, 6, W - 6, 22], fill=cols[0])
+        d.rounded_rectangle([6, 6, 44, H - 6], radius=17, fill=cols[1])
+        d.rounded_rectangle([40, 38, 70, 60], radius=11, fill=(0, 0, 0))
+        d.text((W - 10, 36), "BRUCE", font=f, fill=cols[0], anchor="ra")
+        for k in range(8):  # status blocks light up one by one
+            x, y = 60 + (k % 4) * 64, 110 + (k // 4) * 40
+            lit = k <= i + 1
+            d.rounded_rectangle([x, y, x + 58, y + 32], radius=14, fill=cols[(k + 2) % 6] if lit else (40, 40, 40))
+            d.text((x + 52, y + 16), "%d" % (1024 + k * 37), font=s, fill=(0, 0, 0), anchor="rm")
+        if i >= 6: d.text((60, 206), "ALL SYSTEMS NOMINAL", font=s, fill=cols[3])
+        frames.append(q(img, 16))
+    return frames
+
+
+# ── 11 space-crawl ──
+CRAWL = dict(bg="000000", text="FFE81F", dim="4DA6FF", led="FFE81F", icons=icons(others=0xF0463, lora=0xF0471))
+
+
+def crawl_icon(key, S, t):
+    rnd = random.Random("crawl-" + key)
+    img = solid((S, S), (0, 0, 0)); d = ImageDraw.Draw(img)
+    for _ in range(14): d.point((rnd.randrange(S), rnd.randrange(S)), fill=(rnd.randint(120, 255),) * 3)
+    m = mask_of(t, key, S, 0.64)
+    m = m.transform((S, S), Image.QUAD, (-S * 0.18, 0, -S * 0.02, S, S * 1.02, S, S * 1.18, 0))  # tilt back
+    paint(img, m, hexrgb("FFE81F"))
+    return img
+
+
+def crawl_boot(W, H, t):
+    f = vfont(F("Oswald.ttf"), 20, 600); big = vfont(F("Oswald.ttf"), 40, 700); blue = vfont(F("Oswald.ttf"), 17, 400)
+    rnd = random.Random(21)
+    stars = [(rnd.randrange(W), rnd.randrange(H), rnd.randint(110, 255)) for _ in range(70)]
+    text = ["EPISODE CYD", "BRUCE", "It is a period of civil", "hacking. Rebel devices,", "striking from a hidden", "workbench, have won", "their first victory..."]
+    frames = []
+    for i in range(9):
+        img = solid((W, H), (0, 0, 0)); d = ImageDraw.Draw(img)
+        for x, y, v in stars: d.point((x, y), fill=(v, v, v))
+        if i < 2:
+            d.text((W // 2, H // 2 - 12), "Not long ago, on a workbench", font=blue, fill=hexrgb("4DA6FF"), anchor="mm")
+            d.text((W // 2, H // 2 + 12), "nearby....", font=blue, fill=hexrgb("4DA6FF"), anchor="mm")
+        else:
+            page = Image.new("L", (W, 520), 0); pd = ImageDraw.Draw(page)
+            y = 250 - (i - 2) * 30
+            for k, s in enumerate(text):
+                pd.text((W // 2, y), s, font=big if k == 1 else f, fill=255, anchor="mm"); y += 56 if k == 1 else 34
+            crawl = page.transform((W, H), Image.QUAD, (W * 0.38, 0, 0, 520, W, 520, W * 0.62, 0), Image.BILINEAR)
+            paint(img, crawl, hexrgb("FFE81F"))
+        frames.append(q(img, 16))
+    return frames
+
+
+# ── 12 wall-lights ──
+WALL = dict(bg="0E0A08", text="E81C1C", dim="8A5A3A", led="FF3B3B",
+            bulbs=["FF3030", "30A0FF", "FFD030", "30E060", "FF60E0"], icons=icons(others=0xF0335, rfid=0xF109C))
+
+
+def wall_icon(key, S, t):
+    img = metal((S, S), hexrgb("3A2A1E"), hexrgb("241810"), hexrgb("120C08")); d = ImageDraw.Draw(img)
+    pts = [(x, 16 + int(6 * math.sin(x / 14))) for x in range(0, S + 1, 4)]
+    d.line(pts, fill=(20, 20, 16), width=2)
+    for k, x in enumerate(range(10, S, 22)):  # string of bulbs
+        y = 16 + int(6 * math.sin(x / 14)) + 6
+        col = hexrgb(t["bulbs"][(k + MENUS.index(key)) % 5])
+        img.paste(solid((S, S), col), (0, 0), glowm(text_mask((S, S), (x, y + 3), "●", ImageFont.truetype(NERD, 14)), 4, 1.2))
+        d.ellipse([x - 4, y - 1, x + 4, y + 9], fill=col)
+    m = mask_of(t, key, S, 0.5, 0.58)
+    paint(img, glowm(m, 5, 1.6), (120, 10, 10))
+    paint(img, ring(m, 5), hexrgb("FF3B3B"))
+    return img
+
+
+def wall_boot(W, H, t):
+    f = vfont(F("LibreBaskerville.ttf"), 50, 700); lf = vfont(F("LibreBaskerville.ttf"), 20, 700)
+    rows = ["ABCDEFGH", "IJKLMNOPQ", "RSTUVWXYZ"]
+    pos = {}
+    for r, row in enumerate(rows):
+        for k, ch in enumerate(row):
+            pos[ch] = (22 + k * (276 // (len(row) - 1)), 118 + r * 42)
+    word = "BRUCE"
+    frames = []
+    for i in range(9):
+        img = metal((W, H), hexrgb("5A4636"), hexrgb("3A2A1E"), hexrgb("1E140C")); d = ImageDraw.Draw(img)
+        for ch, (x, y) in pos.items():
+            d.line([(x - 16, y - 18), (x + 16, y - 18)], fill=(25, 20, 15), width=2)
+            d.text((x, y), ch, font=lf, fill=(20, 16, 12), anchor="mm")
+            lit = i < 6 and ch == word[i % 5] and i < 5 or (i >= 6 and ch in word)
+            col = hexrgb(t["bulbs"][ord(ch) % 5])
+            if lit: img.paste(solid((W, H), col), (0, 0), glowm(text_mask((W, H), (x, y - 16), "●", ImageFont.truetype(NERD, 16)), 6, 1.5))
+            d = ImageDraw.Draw(img)
+            d.ellipse([x - 4, y - 22, x + 4, y - 12], fill=col if lit else (50, 45, 40))
+        if i >= 6:
+            m = text_mask((W, H), (W // 2, 56), "BRUCE", f)
+            paint(img, glowm(m, 6, 1.6), (150, 10, 10))
+            paint(img, ring(m, 5), hexrgb("FF3B3B"))
+        frames.append(q(img, 32))
+    return frames
+
+
+# ── 13 time-circuits ──
+TIME = dict(bg="1C1C1C", text="FF3030", dim="30FF60", led="FFB000", leds=["FF3030", "30FF60", "FFB000"],
+            icons=icons(others=0xF07AC, rf=0xF0241, clock=0xF0152))
+SEGS = {"0": "abcdef", "1": "bc", "2": "abged", "3": "abgcd", "4": "fgbc", "5": "afgcd", "6": "afgedc", "7": "abc", "8": "abcdefg", "9": "abcdfg"}
+
+
+def seg_digit(d, x, y, w, h, ch, col, dim):
+    tseg = max(2, w // 5)
+    rects = {"a": (x, y, x + w, y + tseg), "g": (x, y + h // 2 - tseg // 2, x + w, y + h // 2 + tseg // 2), "d": (x, y + h - tseg, x + w, y + h),
+             "f": (x, y, x + tseg, y + h // 2), "b": (x + w - tseg, y, x + w, y + h // 2),
+             "e": (x, y + h // 2, x + tseg, y + h), "c": (x + w - tseg, y + h // 2, x + w, y + h)}
+    for sname, r in rects.items(): d.rectangle(r, fill=col if sname in SEGS.get(ch, "") else dim)
+
+
+def time_icon(key, S, t):
+    col = cycle(t, key, "leds")
+    img = solid((S, S), (40, 40, 40)); d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, S - 1, 24], fill=(70, 70, 70))
+    d.text((S // 2, 12), key.upper(), font=vfont(F("Antonio.ttf"), 15, 700), fill=(220, 220, 220), anchor="mm")
+    d.rectangle([10, 32, S - 11, S - 11], fill=(8, 8, 8), outline=(90, 90, 90), width=2)
+    m = mask_of(t, key, S, 0.46, 0.6)
+    paint(img, glowm(m, 5, 1.5), tuple(v // 3 for v in col))
+    paint(img, m, col)
+    return img
+
+
+def time_boot(W, H, t):
+    lab = vfont(F("Antonio.ttf"), 12, 700); mon = vfont(F("Antonio.ttf"), 26, 700); ttl = vfont(F("Oswald.ttf"), 30, 700)
+    rows = [("DESTINATION TIME", "OCT", "26", "1985", "0121"), ("PRESENT TIME", "SEP", "23", "2026", "1958"), ("LAST TIME DEPARTED", "NOV", "05", "1955", "0600")]
+    frames = []
+    for i in range(8):
+        img = solid((W, H), (28, 28, 28)); d = ImageDraw.Draw(img)
+        d.text((W // 2, 18), "BRUCE TIME CIRCUITS", font=ttl, fill=(200, 200, 200), anchor="mm")
+        for r, (label, mo, dd, yy, hm) in enumerate(rows):
+            y = 42 + r * 64
+            col = hexrgb(t["leds"][r]); dim = tuple(v // 7 for v in col)
+            on = i >= r * 2 + 1 and not (i == r * 2 + 1 and r == 0)
+            d.rectangle([6, y, W - 7, y + 58], fill=(12, 12, 12), outline=(90, 90, 90))
+            d.rectangle([80, y + 46, 240, y + 58], fill=(70, 70, 70))
+            d.text((160, y + 52), label, font=lab, fill=(230, 230, 230), anchor="mm")
+            d.text((42, y + 22), mo if on else "", font=mon, fill=col, anchor="mm")
+            x = 78
+            for k, ch in enumerate(dd + yy + hm):
+                seg_digit(d, x, y + 8, 14, 28, ch if on else "", col, dim)
+                x += 20 + (8 if k in (1, 5) else 0)
+        frames.append(q(img, 16))
+    return frames
+
+
+# ── 14 magic-word: early-90s workstation window, 1-bit ──
+MAGIC = dict(bg="FFFFFF", text="000000", dim="808080", led="FF0000", grid=30,
+             icons=icons(others=0xF1362, interpreter=0xF018D))
+
+
+def window_icon(key, S, t):
+    img = solid((S, S), (255, 255, 255)); d = ImageDraw.Draw(img)
+    d.rectangle([2, 2, S - 3, S - 3], outline=(0, 0, 0), width=2)
+    for y in range(6, 20, 3): d.line([(4, y), (S - 5, y)], fill=(0, 0, 0))
+    d.rectangle([12, 5, 24, 18], fill=(255, 255, 255), outline=(0, 0, 0))
+    d.line([(2, 22), (S - 3, 22)], fill=(0, 0, 0), width=2)
+    g = t["grid"]
+    spr = sprite(pixelate(mask_of(t, key, S, 0.5, 0.58), g), (0, 0, 0), (0, 0, 0), (255, 255, 255), g).resize((S, S), Image.NEAREST)
+    img.paste(spr, (0, 0), spr)
+    return img
+
+
+def magic_boot(W, H, t):
+    f = ImageFont.truetype(str(F("VT323.ttf")), 21)
+    lines = ["BRUCE Park, System Security Interface", "Version 4.0.5, Alpha E", "Ready...", "> access security",
+             "access: PERMISSION DENIED.", "> access main security grid", "access: PERMISSION DENIED....and...."]
+    frames = []
+    for i in range(9):
+        img = solid((W, H), (255, 255, 255)); d = ImageDraw.Draw(img)
+        d.rectangle([0, 0, W - 1, 18], fill=(255, 255, 255)); [d.line([(0, y), (W, y)], fill=(0, 0, 0)) for y in range(3, 17, 3)]
+        d.text((W // 2, 9), " BRUCE ", font=f, fill=(0, 0, 0), anchor="mm")
+        d.line([(0, 19), (W, 19)], fill=(0, 0, 0), width=2)
+        for k, s in enumerate(lines[:min(len(lines), i + 1)]): d.text((6, 22 + k * 20), s, font=f, fill=(0, 0, 0))
+        if i >= 7:
+            for k in range(3): d.text((6, 166 + k * 20), "YOU DIDN'T SAY THE MAGIC WORD!", font=f, fill=(0, 0, 0))
+        frames.append(q(img, 2))
+    return frames
+
+
+# ── 15 ghost-zapper ──
+ZAP = dict(bg="1B1030", text="B7FF3C", dim="7A5FB0", led="B7FF3C", icons=icons(others=0xF02A0, config=0xF0241))
+
+
+def zap_icon(key, S, t):
+    rnd = random.Random("zap-" + key)
+    img = solid((S, S), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+    m = mask_of(t, key, S, 0.52, 0.45)
+    slime = m.filter(ImageFilter.MaxFilter(11))
+    sd = ImageDraw.Draw(slime)
+    bb = m.getbbox() or (0, 0, S, S)
+    for _ in range(3):
+        x = rnd.randint(bb[0] + 6, bb[2] - 6); y = bb[3] + 2; ln = rnd.randint(10, 26)
+        sd.rounded_rectangle([x - 3, y - 6, x + 3, y + ln], radius=3, fill=255); sd.ellipse([x - 5, y + ln - 4, x + 5, y + ln + 6], fill=255)
+    paint(img, glowm(slime, 6, 1.3), (40, 90, 10))
+    paint(img, slime, hexrgb("7ED321"))
+    paint(img, m, (255, 255, 255))
+    return img
+
+
+def zap_boot(W, H, t):
+    f = ImageFont.truetype(str(F("Bangers-Regular.ttf")), 70)
+    g = glyph_mask(0xF02A0, 90, 110)
+    rnd = random.Random(6)
+    frames = []
+    for i in range(8):
+        img = solid((W, H), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+        d.rectangle([W // 2 - 30, 206, W // 2 + 30, 226], fill=(160, 160, 160), outline=(40, 40, 40), width=2)  # trap
+        d.rectangle([W // 2 - 26, 202, W // 2 + 26, 206], fill=(255, 220, 0) if i >= 5 else (90, 90, 90))
+        if i < 6:
+            s = 1.0 - max(0, i - 2) * 0.28
+            gm = g.resize((max(1, int(110 * s)), max(1, int(110 * s))))
+            gx, gy = W // 2 - gm.width // 2, int(60 + max(0, i - 2) * 38)
+            paint(img, glowm(Image.new("L", (W, H), 0), 1), (0, 0, 0))
+            img.paste(solid(gm.size, (170, 255, 120)), (gx, gy), gm)
+            for k in range(2):  # proton streams
+                pts = [(0 if k == 0 else W, 230)]
+                for step in range(1, 7):
+                    x = (0 if k == 0 else W) + (gx + gm.width // 2 - (0 if k == 0 else W)) * step / 6
+                    pts.append((x, 230 + (gy + gm.height // 2 - 230) * step / 6 + rnd.randint(-8, 8)))
+                d.line(pts, fill=(255, 120, 40), width=4); d.line(pts, fill=(255, 240, 200), width=1)
+        if i >= 5:
+            m = text_mask((W, H), (W // 2, 90), "BRUCE", f)
+            paint(img, m.filter(ImageFilter.MaxFilter(9)), (40, 90, 10))
+            paint(img, m, hexrgb("B7FF3C"))
+        frames.append(q(img, 24))
+    return frames
+
+
+# ── 16 light-grid ──
+GRIDT = dict(bg="00060D", text="6FF6FF", dim="1B6E8A", led="6FF6FF",
+             colors=["6FF6FF", "FF9A1F"], icons=icons(others=0xF037C))
+
+
+def perspective_grid(d, W, H, horizon, col, phase=0.0, spacing=10):
+    for k in range(-12, 13):
+        d.line([(W / 2 + k * 6, horizon), (W / 2 + k * W / 5, H)], fill=col)
+    y, step = horizon, 2.0 + phase * 2
+    while y < H:
+        d.line([(0, y), (W, y)], fill=col); step *= 1.35; y += step
+
+
+def grid_icon(key, S, t):
+    col = cycle(t, key)
+    img = solid((S, S), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+    perspective_grid(d, S, S, int(S * 0.62), tuple(v // 4 for v in hexrgb("6FF6FF")))
+    m = mask_of(t, key, S, 0.5, 0.42)
+    r = ring(m, 5)
+    paint(img, glowm(r, 5, 2.2), tuple(v // 2 for v in col))
+    paint(img, r, col)
+    return img
+
+
+def grid_boot(W, H, t):
+    f = vfont(F("Orbitron.ttf"), 56, 900)
+    cy, org = hexrgb("6FF6FF"), hexrgb("FF9A1F")
+    frames = []
+    for i in range(8):
+        img = solid((W, H), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+        perspective_grid(d, W, H, 130, tuple(v // 3 for v in cy), phase=(i % 4) / 4)
+        L = min(W, 40 * (i + 1))
+        for (y, col, dirn) in ((190, cy, 1), (215, org, -1)):  # light-cycle trails
+            x0 = 0 if dirn > 0 else W
+            x1 = x0 + dirn * L
+            tr = Image.new("L", (W, H), 0); ImageDraw.Draw(tr).line([(x0, y), (x1, y)], fill=255, width=3)
+            paint(img, glowm(tr, 4, 2), tuple(v // 2 for v in col)); paint(img, tr, col)
+        m = text_mask((W, H), (W // 2, 70), "BRUCE", f)
+        k = min(1.0, i / 4)
+        paint(img, glowm(m, 7, 1.8 * k), tuple(int(v * 0.45) for v in cy))
+        paint(img, ring(m, 3), cy)
+        frames.append(q(img, 24))
+    return frames
+
+
+THEMES.update({
+    "maze-chomper": (MAZE, maze_icon, maze_boot),
+    "block-stack": (STACK, stack_icon, stack_boot),
+    "block-craft": (CRAFT, craft_icon, craft_boot),
+    "wasteland-terminal": (WASTE, phosphor_icon, waste_boot),
+    "versus-fighter": (FIGHT, fighter_icon, fighter_boot),
+    "soul-battle": (SOUL, soul_icon, soul_boot),
+    "vector-rocks": (VECTOR, vector_icon, vector_boot),
+    "speed-rings": (SPEED, speed_icon, speed_boot),
+    "hacker-mask": (HACKER, hacker_icon, hacker_boot),
+    "starship-panel": (PANEL, panel_icon, panel_boot),
+    "space-crawl": (CRAWL, crawl_icon, crawl_boot),
+    "wall-lights": (WALL, wall_icon, wall_boot),
+    "time-circuits": (TIME, time_icon, time_boot),
+    "magic-word": (MAGIC, window_icon, magic_boot),
+    "ghost-zapper": (ZAP, zap_icon, zap_boot),
+    "light-grid": (GRIDT, grid_icon, grid_boot),
+})
+PIXEL_STYLE = {"hero-quest", "pixel-plumber", "alien-arcade", "wild-encounter", "maze-chomper", "block-stack",
+               "block-craft", "soul-battle", "vector-rocks", "magic-word", "time-circuits"}
+
+
+# ═════════════════════════ batch 3: gacha / portal cartoon / alien cartoon / 90s couch cartoon ═════════════════════════
+GACHA = dict(bg="0D0A24", text="FFD66B", dim="8C7BD6", led="FFD66B",
+             rarities=[("FFE9A3", "D4A017", "7A5A00", 5), ("E6C8FF", "A259FF", "4B1E8C", 4), ("C8E6FF", "3E8BFF", "173E80", 3)],
+             icons=icons(others=0xF0AE2, config=0xF0B8A, files=0xF0726, rfid=0xF0638))
+
+
+def star5(d, cx, cy, r, col, outline=None):
+    pts = [(cx + (r if k % 2 == 0 else r * 0.45) * math.cos(-math.pi / 2 + k * math.pi / 5),
+            cy + (r if k % 2 == 0 else r * 0.45) * math.sin(-math.pi / 2 + k * math.pi / 5)) for k in range(10)]
+    d.polygon(pts, fill=col, outline=outline)
+
+
+def gacha_icon(key, S, t):
+    idx = MENUS.index(key)
+    light, mid, dark, stars = [hexrgb(c) if isinstance(c, str) else c for c in t["rarities"][0 if idx % 5 == 0 else (1 if idx % 2 else 2)]]
+    img = solid((S, S), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+    card = Image.new("L", (S, S), 0); ImageDraw.Draw(card).rounded_rectangle([14, 6, S - 15, S - 7], radius=10, fill=255)
+    img.paste(metal((S, S), light, mid, dark), (0, 0), card)
+    d.rounded_rectangle([20, 12, S - 21, S - 13], radius=7, fill=tuple(v // 3 for v in dark))
+    d.rounded_rectangle([14, 6, S - 15, S - 7], radius=10, outline=light, width=2)
+    m = mask_of(t, key, S, 0.44, 0.44)
+    paint(img, glowm(m, 6, 1.4), mid); paint(img, m, (255, 255, 255))
+    for k in range(stars):
+        star5(d, S // 2 + (k - (stars - 1) / 2) * 15, S - 26, 6, hexrgb("FFD66B"), (90, 60, 0))
+    sparkle(d, 26, 22, 6, (255, 255, 255))
+    return img
+
+
+def gacha_boot(W, H, t):
+    f = vfont(F("Oswald.ttf"), 34, 700); s = vfont(F("Oswald.ttf"), 16, 600)
+    gold = hexrgb("FFD66B")
+    frames = []
+    for i in range(9):
+        img = solid((W, H), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+        for k in range(3):  # summoning circle
+            r = 40 + k * 22
+            d.ellipse([W // 2 - r * 1.6, 200 - r * 0.4, W // 2 + r * 1.6, 200 + r * 0.4], outline=(120, 90, 220), width=2)
+        if 1 <= i <= 4:  # beam of light
+            bw = 10 + i * 12
+            beam = Image.new("L", (W, H), 0); ImageDraw.Draw(beam).rectangle([W // 2 - bw, 0, W // 2 + bw, 200], fill=255)
+            paint(img, glowm(beam, 10, 1.2), (255, 240, 200))
+        if i >= 4:  # rainbow glint + card
+            for k, col in enumerate(("FF6B9E", "FFD84D", "6EDC8C", "5DBBFF", "A77BFF")):
+                a = i * 0.3 + k * 1.25
+                d.line([(W // 2, 104), (W // 2 + 170 * math.cos(a), 104 + 170 * math.sin(a))], fill=hexrgb(col), width=3)
+            flip = min(1.0, (i - 3) / 3)
+            cw = int(110 * flip)
+            card = Image.new("L", (W, H), 0); ImageDraw.Draw(card).rounded_rectangle([W // 2 - cw // 2, 30, W // 2 + cw // 2, 178], radius=10, fill=255)
+            img.paste(metal((W, H), hexrgb("FFE9A3"), hexrgb("D4A017"), hexrgb("7A5A00")), (0, 0), card)
+            d = ImageDraw.Draw(img)
+            if flip >= 1:
+                d.rounded_rectangle([W // 2 - 48, 38, W // 2 + 48, 170], radius=7, fill=(40, 26, 80))
+                d.text((W // 2, 92), "BRUCE", font=f, fill=gold, anchor="mm")
+                for k in range(5): star5(d, W // 2 + (k - 2) * 17, 140, 7, gold, (90, 60, 0))
+        if i >= 7:
+            d.text((W // 2, 222), "SSR GET!", font=s, fill=gold, anchor="mm")
+            for x in (W // 2 - 56, W // 2 + 56): star5(d, x, 222, 8, gold, (90, 60, 0))
+        frames.append(q(img, 48))
+    return frames
+
+
+PORTAL = dict(bg="14142A", text="B6F24A", dim="6FA3B8", led="3EF000",
+              icons=icons(others=0xF124B, nrf=0xF0768, gps=0xF01E7))
+
+
+def swirl(size, cx, cy, r, turns, phase, cols):
+    """Green portal: concentric wobbly swirl bands."""
+    img = Image.new("RGBA", size, (0, 0, 0, 0)); d = ImageDraw.Draw(img)
+    for k in range(int(r), 0, -3):
+        a = phase + (r - k) / r * turns * math.pi * 2
+        col = cols[(int((r - k) / 3) + int(phase * 3)) % len(cols)]
+        ox, oy = 3 * math.cos(a), 3 * math.sin(a)
+        d.ellipse([cx - k + ox, cy - k * 0.95 + oy, cx + k + ox, cy + k * 0.95 + oy], fill=col + (255,))
+    return img
+
+
+PORTAL_COLS = [hexrgb(c) for c in ("2D8A12", "3EB51C", "6BD62A", "B6F24A", "E6FF9A", "6BD62A")]
+
+
+def portal_icon(key, S, t):
+    rnd = random.Random("portal-" + key)
+    img = solid((S, S), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+    for _ in range(8): d.point((rnd.randrange(S), rnd.randrange(S)), fill=(200, 200, 230))
+    sw = swirl((S, S), S // 2, S // 2, S * 0.44, 1.5, rnd.random() * 6, PORTAL_COLS)
+    img.paste(sw, (0, 0), sw)
+    m = mask_of(t, key, S, 0.46)
+    paint(img, m.filter(ImageFilter.MaxFilter(9)), (20, 30, 20)); paint(img, m, (255, 255, 255))
+    return img
+
+
+def portal_boot(W, H, t):
+    f = ImageFont.truetype(str(F("Fredoka.ttf")), 70); f.set_variation_by_axes([700, 100])
+    s = ImageFont.truetype(str(F("Fredoka.ttf")), 16); s.set_variation_by_axes([600, 100])
+    frames = []
+    for i in range(8):
+        img = solid((W, H), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+        r = min(110, 20 + i * 22)
+        sw = swirl((W, H), W // 2, H // 2, r, 2, i * 0.7, PORTAL_COLS)
+        img.paste(sw, (0, 0), sw)
+        if i >= 4:
+            m = text_mask((W, H), (W // 2, H // 2), "BRUCE", f)
+            wob = Image.new("L", (W, H), 0)
+            for x in range(0, W, 4):  # wobble: shift each 4px column up/down on a sine
+                wob.paste(m.crop((x, 0, x + 4, H)), (x, int(5 * math.sin(x / 26 + i))))
+            m = wob
+            paint(img, m.filter(ImageFilter.MaxFilter(11)), (20, 60, 10)); paint(img, m, hexrgb("B6F24A"))
+        if i >= 6: d.text((W // 2, 222), "*burp* ...let's go.", font=s, fill=(230, 255, 200), anchor="mm")
+        frames.append(q(img, 32))
+    return frames
+
+
+IRK = dict(bg="0A0008", text="FF2E9E", dim="8A2A6A", led="FF2E9E",
+           icons=icons(others=0xF089A, config=0xF06A9, nrf=0xF10C4))
+
+
+def hexgrid(d, W, H, r, col, width=1):
+    h = r * math.sqrt(3)
+    for row in range(-1, int(H / h) + 2):
+        for colx in range(-1, int(W / (r * 1.5)) + 2):
+            cx = colx * r * 1.5; cy = row * h + (h / 2 if colx % 2 else 0)
+            d.polygon([(cx + r * math.cos(k * math.pi / 3), cy + r * math.sin(k * math.pi / 3)) for k in range(6)], outline=col, width=width)
+
+
+def irk_icon(key, S, t):
+    rnd = random.Random("irk-" + key)
+    img = solid((S, S), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+    hexgrid(d, S, S, 14, (60, 0, 40))
+    m = mask_of(t, key, S, 0.54)
+    paint(img, glowm(m, 7, 1.8), (140, 0, 80))
+    paint(img, m, hexrgb("FF2E9E"))
+    paint(img, ImageChops.subtract(m, m.filter(ImageFilter.MinFilter(5))), (255, 190, 225))
+    for _ in range(3):
+        x, y = rnd.randrange(10, S - 10), rnd.randrange(10, S - 10)
+        d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=(255, 30, 30))
+    return img
+
+
+def irk_boot(W, H, t):
+    f = vfont(F("Orbitron.ttf"), 54, 900); s = vfont(F("Orbitron.ttf"), 15, 700)
+    pink = hexrgb("FF2E9E")
+    rnd = random.Random(12)
+    traces = [[(rnd.randrange(W), rnd.randrange(H))] for _ in range(10)]
+    for tr in traces:
+        for _ in range(5):
+            x, y = tr[-1]
+            tr.append((x + rnd.choice([-1, 1]) * rnd.randint(15, 50), y) if len(tr) % 2 else (x, y + rnd.choice([-1, 1]) * rnd.randint(15, 40)))
+    frames = []
+    for i in range(8):
+        img = solid((W, H), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+        hexgrid(d, W, H, 18, (45, 0, 30))
+        for tr in traces:  # circuits power up segment by segment
+            seg = tr[:min(len(tr), i + 1)]
+            if len(seg) > 1: d.line(seg, fill=(160, 20, 100), width=2); d.ellipse([seg[-1][0] - 3, seg[-1][1] - 3, seg[-1][0] + 3, seg[-1][1] + 3], fill=pink)
+        if i >= 3:
+            m = text_mask((W, H), (W // 2, 104), "BRUCE", f)
+            paint(img, glowm(m, 8, 1.8), (120, 0, 70)); paint(img, m, pink)
+        if i >= 5: d.text((W // 2, 160), "ALL HAIL BRUCE", font=s, fill=(255, 60, 60), anchor="mm")
+        frames.append(q(img, 24))
+    return frames
+
+
+COUCH = dict(bg="1E2A6E", text="FFE14D", dim="8FA6FF", led="FFE14D",
+             panels=["FFE14D", "4DB8FF", "FF7A3D", "7ED957"],
+             icons=icons(others=0xF07F4, fm=0xF02C4, config=0xF0238))
+
+
+def scribble(d, mask, rnd, col, passes=2, width=3):
+    """Hand-drawn marker outline: jittered traces around the mask edge."""
+    edge = ImageChops.subtract(mask.filter(ImageFilter.MaxFilter(3)), mask).point(lambda v: 255 if v > 60 else 0)
+    W, H = mask.size
+    px = edge.load()
+    for _ in range(passes):
+        jx, jy = rnd.uniform(-2, 2), rnd.uniform(-2, 2)
+        for y in range(0, H, 2):
+            for x in range(0, W, 2):
+                if px[x, y]: d.ellipse([x + jx - width / 2, y + jy - width / 2, x + jx + width / 2, y + jy + width / 2], fill=col)
+
+
+def couch_icon(key, S, t):
+    rnd = random.Random("couch-" + key)
+    img = solid((S, S), cycle(t, key, "panels")); d = ImageDraw.Draw(img)
+    for _ in range(5):  # loose marker hatching
+        x = rnd.randrange(-20, S)
+        d.line([(x, S), (x + 30, S - 30)], fill=tuple(max(0, v - 30) for v in cycle(t, key, "panels")), width=3)
+    m = mask_of(t, key, S, 0.56)
+    paint(img, m, (255, 255, 255))
+    scribble(d, m, rnd, (20, 20, 20), passes=2, width=4)
+    d.rectangle([2, 2, S - 3, S - 3], outline=(20, 20, 20), width=3)
+    return img
+
+
+def couch_boot(W, H, t):
+    f = ImageFont.truetype(str(F("Bangers-Regular.ttf")), 58); s = ImageFont.truetype(str(F("Bangers-Regular.ttf")), 22)
+    rnd = random.Random(1)
+    frames = []
+    for i in range(8):
+        img = solid((W, H), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+        d.rounded_rectangle([40, 30, 280, 190], radius=18, fill=(90, 60, 40), outline=(20, 20, 20), width=4)  # TV cabinet
+        d.rounded_rectangle([58, 46, 232, 174], radius=14, fill=(30, 30, 30), outline=(20, 20, 20), width=3)
+        for k in range(3): d.ellipse([246, 60 + k * 36, 266, 80 + k * 36], fill=(200, 180, 120), outline=(20, 20, 20), width=2)
+        d.line([(120, 30), (90, 4)], fill=(20, 20, 20), width=3); d.line([(180, 30), (214, 2)], fill=(20, 20, 20), width=3)
+        if i < 4:  # static
+            for _ in range(700):
+                x, y = rnd.randrange(62, 229), rnd.randrange(50, 171)
+                v = rnd.choice((40, 200, 255)); d.rectangle([x, y, x + 2, y + 1], fill=(v, v, v))
+        else:
+            m = text_mask((W, H), (145, 110), "BRUCE", f)
+            paint(img, m, hexrgb("FFE14D"))
+            scribble(ImageDraw.Draw(img), m, random.Random(i), (20, 20, 20), passes=1, width=3)
+        d = ImageDraw.Draw(img)
+        d.rectangle([20, 196, W - 20, H - 6], fill=(60, 40, 30), outline=(20, 20, 20), width=3)  # couch
+        if i >= 6: d.text((W // 2, 216), "heh heh. this rocks.", font=s, fill=(255, 255, 255), anchor="mm", stroke_width=2, stroke_fill=(20, 20, 20))
+        frames.append(q(img, 24))
+    return frames
+
+
+THEMES.update({
+    "gacha-pull": (GACHA, gacha_icon, gacha_boot),
+    "dimension-hop": (PORTAL, portal_icon, portal_boot),
+    "tiny-invader": (IRK, irk_icon, irk_boot),
+    "couch-critics": (COUCH, couch_icon, couch_boot),
+})
+
+
+def littlefs_image(theme_dir, name, size=0x30000, block=4096):
+    """Build a LittleFS image holding the theme + a bruce.conf selecting it. Returns (bytes, used_blocks) or None if full."""
+    from littlefs import LittleFS, errors
     fs = LittleFS(block_size=block, block_count=size // block, name_max=64, disk_version=0x00020000)
-    fs.mkdir(f"/{name}")
-    for p in sorted(theme_dir.iterdir()):
-        with fs.open(f"/{name}/{p.name}", "wb") as fh: fh.write(p.read_bytes())
-    th = json.loads((theme_dir / f"{name}.json").read_text())
-    conf = {k: th[k] for k in ("priColor", "secColor", "bgColor")}
-    conf.update(themeFile=f"/{name}/{name}.json", themeOnSd=1)
-    with fs.open("/bruce.conf", "w") as fh: fh.write(json.dumps(conf))
-    out.write_bytes(fs.context.buffer)
-    free = size // block - fs.used_block_count
-    print(f"  LittleFS image: {out}  ({fs.used_block_count}/{size // block} blocks, {free} free)")
-    if free < 3: print("  warning: too full, Bruce needs >4 KB free")
+    try:
+        fs.mkdir(f"/{name}")
+        for p in sorted(theme_dir.iterdir()):
+            with fs.open(f"/{name}/{p.name}", "wb") as fh: fh.write(p.read_bytes())
+        th = json.loads((theme_dir / f"{name}.json").read_text())
+        conf = {k: th[k] for k in ("priColor", "secColor", "bgColor")}
+        conf.update(themeFile=f"/{name}/{name}.json", themeOnSd=1)
+        with fs.open("/bruce.conf", "w") as fh: fh.write(json.dumps(conf))
+    except errors.LittleFSError:
+        return None
+    return bytes(fs.context.buffer), fs.used_block_count
+
+
+MIN_FREE = 5  # Bruce adds brucePins.conf + rewrites bruce.conf and wants >4 KB spare
+# JPG settings tried in order until the theme fits the CYD's 192 KB LittleFS
+QUALITY_STEPS = [(90, 0), (85, 2), (78, 2), (70, 2), (62, 2), (55, 2)]
 
 
 def build(name, a):
@@ -709,10 +1705,7 @@ def build(name, a):
     W, H, S = 320, 240, 132
     out = a.out / name
     out.mkdir(parents=True, exist_ok=True)
-    pixel = name in ("hero-quest", "pixel-plumber", "alien-arcade", "wild-encounter")
-    for key in MENUS:
-        icon_fn(key, S, t).convert("RGB").save(out / f"{key}.jpg", quality=90 if pixel else 82,
-                                               subsampling=0 if pixel else 2)
+    icons_img = {key: icon_fn(key, S, t).convert("RGB") for key in MENUS}
     frames = boot_fn(W, H, t)
     frames[0].save(out / "boot.gif", save_all=True, append_images=frames[1:],
                    duration=[140] * (len(frames) - 1) + [1500], loop=1, optimize=True)
@@ -721,6 +1714,12 @@ def build(name, a):
                  border=1, label=1, boot_img="boot.gif", ledBright=60, ledColor=t["led"], ledEffect=0,
                  ledEffectSpeed=3, ledEffectDirection=1)
     (out / f"{name}.json").write_text(json.dumps(theme, indent=2) + "\n")
+    steps = QUALITY_STEPS if name in PIXEL_STYLE else QUALITY_STEPS[1:]
+    img = None
+    for qual, sub in steps:
+        for key, im in icons_img.items(): im.save(out / f"{key}.jpg", quality=qual, subsampling=sub)
+        img = littlefs_image(out, name)
+        if img and 48 - img[1] >= MIN_FREE: break
     prev = a.out.parent / "previews" / a.out.name
     prev.mkdir(parents=True, exist_ok=True)
     sheet = Image.new("RGB", (5 * (S + 10) + 10, 3 * (S + 10) + 10), (0, 0, 0))
@@ -731,8 +1730,13 @@ def build(name, a):
     frames[0].save(prev / f"{name}-boot.gif", save_all=True, append_images=frames[1:],
                    duration=[140] * (len(frames) - 1) + [1500], loop=0, optimize=True)
     kb = sum(p.stat().st_size for p in out.iterdir()) / 1024
-    print(f"{name}: {out}/ ({kb:.0f} KB)")
-    if a.littlefs: build_littlefs(out, name, ROOT / "local" / f"{name}-littlefs.bin")
+    boot_kb = (out / "boot.gif").stat().st_size / 1024
+    if not img or 48 - img[1] < MIN_FREE:
+        print(f"{name}: {kb:.0f} KB (boot {boot_kb:.0f} KB)  !! does NOT fit the CYD LittleFS even at q{qual}; SD card only")
+        return False
+    print(f"{name}: {kb:.0f} KB (boot {boot_kb:.0f} KB), icons q{qual}, {img[1]}/48 blocks")
+    if a.littlefs: (ROOT / "local" / f"{name}-littlefs.bin").write_bytes(img[0])
+    return True
 
 
 def main():
@@ -743,7 +1747,10 @@ def main():
     a = ap.parse_args()
     for n in a.names or THEMES:
         if n not in THEMES: sys.exit(f"unknown theme '{n}'")
-        build(n, a)
+        try:
+            build(n, a)
+        except Exception as e:  # keep going so one broken theme doesn't stop a batch
+            import traceback; traceback.print_exc(); print(f"{n}: FAILED ({e})")
 
 
 if __name__ == "__main__":
