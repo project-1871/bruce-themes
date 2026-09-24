@@ -7,6 +7,7 @@ generated straight from [Omarchy](https://omarchy.org) desktop color palettes.**
 
 <img src="previews/japglitch-boot.gif" width="320" alt="Japglitch boot animation">&nbsp;&nbsp;<img src="previews/neon-unix-legs-boot.gif" width="320" alt="Neon Unix Legs boot animation">
 <br><img src="previews/hypr-heels-boot.gif" width="320" alt="Hypr Heels boot animation">&nbsp;&nbsp;<img src="previews/omarfu-boot.gif" width="320" alt="Omarfu boot animation">
+<br><img src="previews/redflag-sword-boot.gif" width="320" alt="Redflag Sword boot animation">
 
 `320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `fits in 192 KB of LittleFS`
 
@@ -52,6 +53,15 @@ Mint white on charcoal, split into lime/hot pink.
 |---|---|---|---|---|
 | `e79b` ![](https://placehold.co/12x12/E4F1DE/E4F1DE.png) | `94f1` ![](https://placehold.co/12x12/929F8C/929F8C.png) | `10a2` ![](https://placehold.co/12x12/161616/161616.png) | ![](https://placehold.co/12x12/67D830/67D830.png) `#67D830` ![](https://placehold.co/12x12/E21F7C/E21F7C.png) `#E21F7C` | `67D830` |
 
+### `redflag-sword`
+Ice white on warm slate, split into signal red/steel blue.
+
+<img src="previews/redflag-sword-icons.png" width="600" alt="redflag-sword icons">
+
+| priColor | secColor | bgColor | fringe | LED |
+|---|---|---|---|---|
+| `ef9e` ![](https://placehold.co/12x12/EBF0F5/EBF0F5.png) | `9cf4` ![](https://placehold.co/12x12/989EA3/989EA3.png) | `2944` ![](https://placehold.co/12x12/2A2A25/2A2A25.png) | ![](https://placehold.co/12x12/E3020F/E3020F.png) `#E3020F` ![](https://placehold.co/12x12/3B95E3/3B95E3.png) `#3B95E3` | `E3020F` |
+
 <details>
 <summary><b>Exact build commands for these themes</b></summary>
 
@@ -60,6 +70,7 @@ Mint white on charcoal, split into lime/hot pink.
 ./bruce-theme-gen.py neon-unix-legs --littlefs
 ./bruce-theme-gen.py hypr-heels     --fringe F5003E,A91DFE --littlefs
 ./bruce-theme-gen.py omarfu         --littlefs
+./bruce-theme-gen.py redflag-sword  --littlefs
 ```
 </details>
 
@@ -109,7 +120,7 @@ pip install -r requirements.txt
 ./bruce-theme-gen.py neon-unix-legs                      # -> themes/neon-unix-legs/
 ./bruce-theme-gen.py japglitch --fringe C921E4,2090E3    # pin the RGB-split colors
 ./bruce-theme-gen.py hypr-heels --littlefs               # + flashable hypr-heels-littlefs.bin
-./bruce-theme-gen.py redflag-sword --sd --boot-wallpaper        # PNG icons + wallpaper boot anim (SD only)
+./bruce-theme-gen.py tux-mosaic --sd --boot-wallpaper        # PNG icons + wallpaper boot anim (SD only)
 ./bruce-theme-gen.py --colors ~/my/colors.toml --name mine
 ```
 
