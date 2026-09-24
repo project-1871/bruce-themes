@@ -11,9 +11,9 @@ glitch themes generated from [Omarchy](https://omarchy.org) desktop palettes, dr
 
 <img src="previews/pop/gallery.gif" width="820" alt="Pop collection boot animations">
 
-`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `33 themes` · `each fits in 192 KB of LittleFS`
+`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `34 themes` · `each fits in 192 KB of LittleFS`
 
-**[▚ Glitch collection](#glitch-collection-16)** · **[🦇 Monster collection](#monster-collection-10)** · **[🎮 Pop collection](#pop-collection-7)** · **[Install](#install)** · **[Make your own](#generate-a-theme-from-any-omarchy-palette)**
+**[▚ Glitch collection](#glitch-collection-16)** · **[🦇 Monster collection](#monster-collection-10)** · **[🎮 Pop collection](#pop-collection-8)** · **[Install](#install)** · **[Make your own](#generate-a-theme-from-any-omarchy-palette)**
 
 </div>
 
@@ -123,7 +123,7 @@ To add a monster, add a line to `MONSTERS` in `bruce-monster-gen.py` with `(back
 
 ---
 
-## ▌Pop collection (7)
+## ▌Pop collection (8)
 
 Tributes to pop culture and genres, each with its own art style instead of a shared effect. Folder: [`pop/`](pop/).
 
@@ -136,6 +136,7 @@ Tributes to pop culture and genres, each with its own art style instead of a sha
 | **`steampunk`** | Victorian science fiction | Engraved brass, copper and pewter icons with rivets on dark leather: airship balloon, gauge, safe, compass rose, magnet, pocket watch, telescope, bowler hat, locomotive, cogs | Meshed gears turn behind a riveted brass **BRUCE** plaque in [Cinzel Decorative](https://fonts.google.com/specimen/Cinzel+Decorative), then *~ patent pending ~* with steam puffs |
 | **`comic-hero`** | superhero comic books | Halftone comic panels with thick ink outlines: radar, shield star, lightning, drama masks, atom, robot, spider, flexed arm, hammer | **BRUCE!** in [Bangers](https://fonts.google.com/specimen/Bangers) shakes onto a starburst, then *POW!* and *ZAP!* bubbles pop in |
 | **`alien-arcade`** | 80s arcade shooters | Neon pixel sprites on a starfield: radar, UFO, TV, safe, bullseye, alien, joystick pad, rocket, shooting star, earth | Original pixel aliens march in formation over a laser cannon, with a *SCORE / HI* bar and blinking *INSERT COIN* |
+| **`rainbow-pony`** | magical cartoon ponies | Glossy pastel badges with a shine and sparkles: cloud, butterfly, magic wand, gem, treble clef, firework, balloon, cupcake, kite, unicorn, hearts, crown | A rainbow sweeps across between two clouds, then a unicorn and **Bruce** in [Pacifico](https://fonts.google.com/specimen/Pacifico) appear with *sparkle on!* |
 
 <!-- pop:start -->
 | Theme | Icons | Text / dim / bg | LED |
@@ -146,6 +147,7 @@ Tributes to pop culture and genres, each with its own art style instead of a sha
 | **`hero-quest`**<br><sub>[boot](previews/pop/hero-quest-boot.gif)</sub> | <img src="previews/pop/hero-quest-icons.png" width="420"> | ![](https://placehold.co/12x12/FFDA7B/FFDA7B.png) ![](https://placehold.co/12x12/7BA173/7BA173.png) ![](https://placehold.co/12x12/081C10/081C10.png)<br><sub>`fecf` `7d0e` `8e2`</sub> | ![](https://placehold.co/12x12/38B848/38B848.png) |
 | **`p-cat`**<br><sub>[boot](previews/pop/p-cat-boot.gif)</sub> | <img src="previews/pop/p-cat-icons.png" width="420"> | ![](https://placehold.co/12x12/D50018/D50018.png) ![](https://placehold.co/12x12/B4657B/B4657B.png) ![](https://placehold.co/12x12/FFDEEE/FFDEEE.png)<br><sub>`d003` `b32f` `fefd`</sub> | ![](https://placehold.co/12x12/FF4F8B/FF4F8B.png) |
 | **`pixel-plumber`**<br><sub>[boot](previews/pop/pixel-plumber-boot.gif)</sub> | <img src="previews/pop/pixel-plumber-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFFFF/FFFFFF.png) ![](https://placehold.co/12x12/183C9C/183C9C.png) ![](https://placehold.co/12x12/5A95FF/5A95FF.png)<br><sub>`ffff` `19f3` `5cbf`</sub> | ![](https://placehold.co/12x12/E40058/E40058.png) |
+| **`rainbow-pony`**<br><sub>[boot](previews/pop/rainbow-pony-boot.gif)</sub> | <img src="previews/pop/rainbow-pony-icons.png" width="420"> | ![](https://placehold.co/12x12/9C4CCD/9C4CCD.png) ![](https://placehold.co/12x12/BD8DD5/BD8DD5.png) ![](https://placehold.co/12x12/F6EAFF/F6EAFF.png)<br><sub>`9a79` `bc7a` `f75f`</sub> | ![](https://placehold.co/12x12/FF7EB9/FF7EB9.png) |
 | **`steampunk`**<br><sub>[boot](previews/pop/steampunk-boot.gif)</sub> | <img src="previews/pop/steampunk-icons.png" width="420"> | ![](https://placehold.co/12x12/EEC273/EEC273.png) ![](https://placehold.co/12x12/8B6939/8B6939.png) ![](https://placehold.co/12x12/181408/181408.png)<br><sub>`ee0e` `8b47` `18a1`</sub> | ![](https://placehold.co/12x12/D4892A/D4892A.png) |
 <!-- pop:end -->
 
@@ -281,7 +283,7 @@ Paths are relative to the JSON file. Supported images: BMP, JPG, PNG, GIF.
 
 Themes and generator: MIT. Bruce is © its authors ([BruceDevices/firmware](https://github.com/BruceDevices/firmware)).
 Palettes come from Omarchy themes. Icons are rendered from [Nerd Fonts](https://www.nerdfonts.com) Material Design glyphs.
-Bundled fonts are all SIL Open Font License, see [`fonts/`](fonts/): [Creepster](https://fonts.google.com/specimen/Creepster) (monster), [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P), [Fredoka](https://fonts.google.com/specimen/Fredoka), [Bangers](https://fonts.google.com/specimen/Bangers) and [Cinzel Decorative](https://fonts.google.com/specimen/Cinzel+Decorative) (pop).
+Bundled fonts are all SIL Open Font License, see [`fonts/`](fonts/): [Creepster](https://fonts.google.com/specimen/Creepster) (monster), [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P), [Fredoka](https://fonts.google.com/specimen/Fredoka), [Bangers](https://fonts.google.com/specimen/Bangers), [Cinzel Decorative](https://fonts.google.com/specimen/Cinzel+Decorative) and [Pacifico](https://fonts.google.com/specimen/Pacifico) (pop).
 
 <sub>▚▞▚▞ made on Omarchy, tested on a real Cheap Yellow Display ▞▚▞▚</sub>
 

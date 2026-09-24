@@ -8,6 +8,7 @@
   steampunk      engraved brass/copper icons with rivets on dark leather, turning gears boot
   comic-hero     halftone comic panels with thick ink outlines, BRUCE! starburst boot with POW/ZAP
   alien-arcade   80s arcade shooter: pixel icons on a starfield, marching original aliens boot
+  rainbow-pony   glossy pastel badges with sparkles, rainbow-sweep boot with a unicorn
 
 Inspired by classic pop culture. All art is drawn here from generic icon glyphs and shapes:
 no official artwork, sprites or logos.
@@ -518,6 +519,80 @@ def arcade_boot(W, H, t):
     return frames
 
 
+# ───────────────────────── rainbow-pony: pastel badges & rainbows ─────────────────────────
+SCRIPT_FONT = ROOT / "fonts" / "Pacifico-Regular.ttf"
+PONY = dict(
+    bg="F3E8FF", text="9B4DCA", dim="B98FD6", led="FF7EB9",
+    badges=[("FFC7E3", "FF7EB9"), ("E2CCFF", "A77BFF"), ("C4EBFF", "5DBBFF"), ("C9F7DC", "4FD18B"),
+            ("FFF4B8", "FFC83D"), ("FFDCC4", "FF935C")],
+    rainbow=["FF6B9E", "FF9F5C", "FFD84D", "6EDC8C", "5DBBFF", "A77BFF"],
+    icons={"wifi": 0xF015F, "ble": 0xF1589, "rf": 0xF1844, "rfid": 0xF0B8A, "fm": 0xF0F70, "ir": 0xF0E30,
+           "files": 0xF1A1D, "gps": 0xF1741, "nrf": 0xF0A26, "interpreter": 0xF095A, "clock": 0xF0599,
+           "lora": 0xF1985, "others": 0xF15C2, "connect": 0xF0A56, "config": 0xF01A5})
+
+
+def pony_icon(key, S, t):
+    rnd = random.Random("pony-" + key)
+    light, deep = (hexrgb(c) for c in rnd.choice(t["badges"]))
+    img = solid((S, S), hexrgb(t["bg"]))
+    d = ImageDraw.Draw(img)
+    r = int(S * 0.43)
+    c = S // 2
+    badge = Image.new("L", (S, S), 0)
+    ImageDraw.Draw(badge).ellipse([c - r, c - r, c + r, c + r], fill=255)
+    d.ellipse([c - r + 3, c - r + 5, c + r + 3, c + r + 5], fill=tuple(max(0, v - 40) for v in hexrgb(t["bg"])))  # soft shadow
+    img.paste(metal((S, S), (255, 255, 255), light, deep), (0, 0), badge)                                      # glossy gradient
+    d.ellipse([c - r, c - r, c + r, c + r], outline=(255, 255, 255), width=4)
+    d.ellipse([c - r * 0.62, c - r * 0.86, c + r * 0.2, c - r * 0.5], fill=tuple(min(255, v + 40) for v in light))  # shine
+    m = glyph_mask(t["icons"][key], int(S * 0.46), S, yfrac=0.53)
+    img.paste(solid((S, S), deep), (2, 3), m)
+    img.paste(solid((S, S), (255, 255, 255)), (0, 0), m)
+    for _ in range(3):
+        sparkle(d, rnd.choice([rnd.randint(8, 22), rnd.randint(S - 22, S - 8)]), rnd.randint(10, S - 10),
+                rnd.randint(4, 8), rnd.choice([deep, (255, 255, 255), hexrgb("FFC83D")]))
+    return img
+
+
+def pony_boot(W, H, t):
+    f = ImageFont.truetype(str(SCRIPT_FONT), 66)
+    small = ImageFont.truetype(str(BUBBLY), 15)
+    small.set_variation_by_axes([700, 100])
+    uni = glyph_mask(0xF15C2, 70, 90)
+    cx, cy, R, band = W // 2, 200, 170, 14
+    rnd = random.Random(8)
+    spots = [(rnd.randint(10, W - 10), rnd.randint(10, H - 10)) for _ in range(12)]
+    frames = []
+    for i in range(8):
+        img = solid((W, H), hexrgb(t["bg"]))
+        d = ImageDraw.Draw(img)
+        sweep = 180 * min(1, (i + 1) / 5)
+        for k, col in enumerate(t["rainbow"]):  # rainbow arc sweeping left -> right
+            rr = R - k * band
+            d.pieslice([cx - rr, cy - rr, cx + rr, cy + rr], 180, 180 + sweep, fill=hexrgb(col))
+        rr = R - len(t["rainbow"]) * band
+        d.pieslice([cx - rr, cy - rr, cx + rr, cy + rr], 180, 360, fill=hexrgb(t["bg"]))
+        for x in (cx - R + 40, cx + R - 40):  # clouds at the rainbow's ends
+            for dx, dy, r in ((-22, 6, 16), (0, 0, 22), (22, 6, 16)):
+                if x > cx and sweep < 180: continue
+                d.ellipse([x + dx - r, cy - 8 + dy - r, x + dx + r, cy - 8 + dy + r], fill=(255, 255, 255))
+        for k, (x, y) in enumerate(spots):
+            if (k + i) % 3: sparkle(d, x, y, 6, hexrgb(rnd.choice(t["rainbow"])))
+        if i >= 4:
+            m = Image.new("L", (W, H), 0)
+            ImageDraw.Draw(m).text((W // 2, 96), "Bruce", font=f, fill=255, anchor="mm")
+            out = m.filter(ImageFilter.MaxFilter(9))
+            img.paste(solid((W, H), hexrgb(t["text"])), (3, 4), out)
+            img.paste(solid((W, H), (255, 255, 255)), (0, 0), out)
+            img.paste(solid((W, H), hexrgb(t["text"])), (0, 0), m)
+            ux = 14 + (i - 4) * 6
+            img.paste(solid((90, 90), (255, 255, 255)), (ux, 20), uni.filter(ImageFilter.MaxFilter(7)))
+            img.paste(solid((90, 90), hexrgb("FF7EB9")), (ux, 20), uni)
+        if i >= 6:
+            ImageDraw.Draw(img).text((W // 2, 225), "sparkle on!", font=small, fill=hexrgb(t["text"]), anchor="mm")
+        frames.append(img.quantize(48, dither=Image.Dither.NONE))
+    return frames
+
+
 THEMES = {
     "p-cat": (PCAT, pcat_icon, pcat_boot),
     "hero-quest": (HERO, lambda k, S, t: pixel_icon(k, S, t, "hero"), hero_boot),
@@ -526,6 +601,7 @@ THEMES = {
     "steampunk": (STEAM, steam_icon, steam_boot),
     "comic-hero": (COMIC, comic_icon, comic_boot),
     "alien-arcade": (ARCADE, arcade_icon, arcade_boot),
+    "rainbow-pony": (PONY, pony_icon, pony_boot),
 }
 
 
