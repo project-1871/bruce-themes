@@ -53,9 +53,10 @@ def replace(readme, tag, body):
                   readme, flags=re.S)
 
 
-glitch, monster = names_in("themes"), names_in("monster")
+glitch, monster, pop = names_in("themes"), names_in("monster"), names_in("pop")
 gallery(glitch, ROOT / "previews", ROOT / "previews" / "gallery.gif")
 gallery(monster, ROOT / "previews" / "monster", ROOT / "previews" / "monster" / "gallery.gif", cols=5, tw=160, th=120)
+gallery(pop, ROOT / "previews" / "pop", ROOT / "previews" / "pop" / "gallery.gif")
 
 build = "\n".join(f"./bruce-theme-gen.py {n:<20}" + (f" --fringe {FRINGE[n]}" if n in FRINGE else "") + " --littlefs"
                   for n in glitch)
@@ -74,8 +75,10 @@ glitch_md = f"""{table(glitch, "themes", "previews")}
 readme = (ROOT / "README.md").read_text()
 readme = replace(readme, "glitch", glitch_md)
 readme = replace(readme, "monster", table(monster, "monster", "previews/monster"))
-readme = re.sub(r"`\d+ themes`", f"`{len(glitch) + len(monster)} themes`", readme)
+readme = replace(readme, "pop", table(pop, "pop", "previews/pop"))
+readme = re.sub(r"`\d+ themes`", f"`{len(glitch) + len(monster) + len(pop)} themes`", readme)
 readme = re.sub(r"(## ▌Glitch collection )\(\d+\)", rf"\g<1>({len(glitch)})", readme)
 readme = re.sub(r"(## ▌Monster collection )\(\d+\)", rf"\g<1>({len(monster)})", readme)
+readme = re.sub(r"(## ▌Pop collection )\(\d+\)", rf"\g<1>({len(pop)})", readme)
 (ROOT / "README.md").write_text(readme)
-print(f"{len(glitch)} glitch + {len(monster)} monster themes")
+print(f"{len(glitch)} glitch + {len(monster)} monster + {len(pop)} pop themes")

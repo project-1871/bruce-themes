@@ -2,16 +2,18 @@
 
 # ▚▞ BRUCE THEMES ▞▚
 
-**Custom themes for [Bruce](https://github.com/BruceDevices/firmware) ESP32 firmware in two collections:
-glitch themes generated from [Omarchy](https://omarchy.org) desktop palettes, and dripping monster themes.**
+**Custom themes for [Bruce](https://github.com/BruceDevices/firmware) ESP32 firmware in three collections:
+glitch themes generated from [Omarchy](https://omarchy.org) desktop palettes, dripping monster themes, and pop-culture tributes.**
 
 <img src="previews/gallery.gif" width="820" alt="Glitch collection boot animations">
 
 <img src="previews/monster/gallery.gif" width="820" alt="Monster collection boot animations">
 
-`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `26 themes` · `each fits in 192 KB of LittleFS`
+<img src="previews/pop/gallery.gif" width="820" alt="Pop collection boot animations">
 
-**[▚ Glitch collection](#glitch-collection-16)** · **[🦇 Monster collection](#monster-collection-10)** · **[Install](#install)** · **[Make your own](#generate-a-theme-from-any-omarchy-palette)**
+`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `30 themes` · `each fits in 192 KB of LittleFS`
+
+**[▚ Glitch collection](#glitch-collection-16)** · **[🦇 Monster collection](#monster-collection-10)** · **[🎮 Pop collection](#pop-collection-4)** · **[Install](#install)** · **[Make your own](#generate-a-theme-from-any-omarchy-palette)**
 
 </div>
 
@@ -121,6 +123,41 @@ To add a monster, add a line to `MONSTERS` in `bruce-monster-gen.py` with `(back
 
 ---
 
+## ▌Pop collection (4)
+
+Tributes to classic pop culture, each with its own art style instead of a shared effect. Folder: [`pop/`](pop/).
+
+| Theme | Inspired by | Style | Boot screen |
+|---|---|---|---|
+| **`p-cat`** | a certain bow-wearing cat | White-outlined candy-pink stickers with gold sparkles: cloud, butterfly, gift, candy, cupcake, teacup, teddy, cat, bow | Bubbly red **Bruce** in [Fredoka](https://fonts.google.com/specimen/Fredoka) with a bow and floating hearts |
+| **`hero-quest`** | 8-bit adventure games | NES-style pixel sprites on a dark forest: bow, key, shield, compass, boomerang, potion, horse, bomb, heart, sword | Heart meter fills up, then *"IT'S DANGEROUS TO GO ALONE! TAKE THIS."* in [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) |
+| **`pixel-plumber`** | 8-bit platformers | Bright pixel sprites on sky blue: star, hand-drawn warp pipe, ? block, mushroom, castle, ghost, flag, hammer | **BRUCE** drops in over a brick floor while ? blocks bump, then *PRESS START* |
+| **`code-rain`** | green digital rain | Katakana code rain behind glowing icons: rotary phone, white rabbit, sunglasses, red pill, and a spoon (there is no spoon) | The rain clears to reveal **BRUCE**, then *wake up, neo...* |
+
+<!-- pop:start -->
+| Theme | Icons | Text / dim / bg | LED |
+|---|---|---|---|
+| **`code-rain`**<br><sub>[boot](previews/pop/code-rain-boot.gif)</sub> | <img src="previews/pop/code-rain-icons.png" width="420"> | ![](https://placehold.co/12x12/00FF41/00FF41.png) ![](https://placehold.co/12x12/008D10/008D10.png) ![](https://placehold.co/12x12/000000/000000.png)<br><sub>`7e8` `462` `0`</sub> | ![](https://placehold.co/12x12/00FF41/00FF41.png) |
+| **`hero-quest`**<br><sub>[boot](previews/pop/hero-quest-boot.gif)</sub> | <img src="previews/pop/hero-quest-icons.png" width="420"> | ![](https://placehold.co/12x12/FFDA7B/FFDA7B.png) ![](https://placehold.co/12x12/7BA173/7BA173.png) ![](https://placehold.co/12x12/081C10/081C10.png)<br><sub>`fecf` `7d0e` `8e2`</sub> | ![](https://placehold.co/12x12/38B848/38B848.png) |
+| **`p-cat`**<br><sub>[boot](previews/pop/p-cat-boot.gif)</sub> | <img src="previews/pop/p-cat-icons.png" width="420"> | ![](https://placehold.co/12x12/D50018/D50018.png) ![](https://placehold.co/12x12/B4657B/B4657B.png) ![](https://placehold.co/12x12/FFDEEE/FFDEEE.png)<br><sub>`d003` `b32f` `fefd`</sub> | ![](https://placehold.co/12x12/FF4F8B/FF4F8B.png) |
+| **`pixel-plumber`**<br><sub>[boot](previews/pop/pixel-plumber-boot.gif)</sub> | <img src="previews/pop/pixel-plumber-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFFFF/FFFFFF.png) ![](https://placehold.co/12x12/183C9C/183C9C.png) ![](https://placehold.co/12x12/5A95FF/5A95FF.png)<br><sub>`ffff` `19f3` `5cbf`</sub> | ![](https://placehold.co/12x12/E40058/E40058.png) |
+<!-- pop:end -->
+
+> All pop art is drawn by the generator from generic icon glyphs and shapes. There's no official artwork, sprites or logos, and no affiliation with any rights holder.
+
+<details>
+<summary><b>Build the pop themes</b></summary>
+
+```bash
+./bruce-pop-gen.py                   # all 4 -> pop/<name>/
+./bruce-pop-gen.py p-cat --littlefs  # one theme + local/p-cat-littlefs.bin
+```
+
+`code-rain` draws its katakana with Noto Sans CJK (`noto-fonts-cjk`), which the repo doesn't bundle.
+</details>
+
+---
+
 ## ▌Install
 
 Pick **one** of the three ways below.
@@ -128,7 +165,7 @@ Pick **one** of the three ways below.
 ### A — microSD card (easiest, lets you keep many themes)
 
 1. Format a microSD card as **FAT32**. Any size works; the themes are ~85 KB each.
-2. Copy theme folders to the **root** of the card, e.g. `themes/japglitch/` → `SD:/japglitch/` or `monster/vampire/` → `SD:/vampire/`. You can copy all of them at once.
+2. Copy theme folders to the **root** of the card, e.g. `themes/japglitch/` → `SD:/japglitch/`, `monster/vampire/` → `SD:/vampire/` or `pop/p-cat/` → `SD:/p-cat/`. You can copy all of them at once.
 3. On the device: **Config → UI Theme → SD → `japglitch/japglitch.json`**.
 
 > [!NOTE]
@@ -238,7 +275,7 @@ Paths are relative to the JSON file. Supported images: BMP, JPG, PNG, GIF.
 
 Themes and generator: MIT. Bruce is © its authors ([BruceDevices/firmware](https://github.com/BruceDevices/firmware)).
 Palettes come from Omarchy themes. Icons are rendered from [Nerd Fonts](https://www.nerdfonts.com) Material Design glyphs.
-The monster collection uses [Creepster](https://fonts.google.com/specimen/Creepster) by Sideshow (SIL Open Font License, see [`fonts/OFL.txt`](fonts/OFL.txt)).
+Bundled fonts are all SIL Open Font License, see [`fonts/`](fonts/): [Creepster](https://fonts.google.com/specimen/Creepster) (monster), [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) and [Fredoka](https://fonts.google.com/specimen/Fredoka) (pop).
 
 <sub>▚▞▚▞ made on Omarchy, tested on a real Cheap Yellow Display ▞▚▞▚</sub>
 
