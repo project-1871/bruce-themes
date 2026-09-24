@@ -1,0 +1,2 @@
+Pillow>=10
+littlefs-python>=0.12  # only needed for --littlefs

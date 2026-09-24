@@ -1,0 +1,4 @@
+# local-only: firmware binaries, device backups, flash images (published as release assets instead)
+local/
+*.bin
+__pycache__/
