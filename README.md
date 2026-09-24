@@ -1,22 +1,27 @@
 <div align="center">
 
-# ▚▞ BRUCE GLITCH THEMES ▞▚
+# ▚▞ BRUCE THEMES ▞▚
 
-**Chromatic-aberration glitch themes for [Bruce](https://github.com/BruceDevices/firmware) ESP32 firmware,
-generated straight from [Omarchy](https://omarchy.org) desktop color palettes.**
+**Custom themes for [Bruce](https://github.com/BruceDevices/firmware) ESP32 firmware in two collections:
+glitch themes generated from [Omarchy](https://omarchy.org) desktop palettes, and dripping monster themes.**
 
-<img src="previews/gallery.gif" width="820" alt="All theme boot animations">
+<img src="previews/gallery.gif" width="820" alt="Glitch collection boot animations">
 
-`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `16 themes` · `each fits in 192 KB of LittleFS`
+<img src="previews/monster/gallery.gif" width="820" alt="Monster collection boot animations">
+
+`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `26 themes` · `each fits in 192 KB of LittleFS`
+
+**[▚ Glitch collection](#glitch-collection-16)** · **[🦇 Monster collection](#monster-collection-10)** · **[Install](#install)** · **[Make your own](#generate-a-theme-from-any-omarchy-palette)**
 
 </div>
 
 ---
 
-## ▌Themes (16)
+## ▌Glitch collection (16)
 
-Every theme is built from the Omarchy theme with the same name. Colors are Bruce RGB565 values.
+Chromatic-aberration icons (RGB-split, sliced scanlines, glitch bars), each built from the Omarchy theme of the same name. Folder: [`themes/`](themes/). Colors are Bruce RGB565 values.
 
+<!-- glitch:start -->
 | Theme | Icons | Text / dim / bg | LED |
 |---|---|---|---|
 | **`arch-mosaic`**<br><sub>[boot](previews/arch-mosaic-boot.gif)</sub> | <img src="previews/arch-mosaic-icons.png" width="420"> | ![](https://placehold.co/12x12/F6F6EE/F6F6EE.png) ![](https://placehold.co/12x12/A4A19C/A4A19C.png) ![](https://placehold.co/12x12/292C29/292C29.png)<br><sub>`f7bd` `a513` `2965`</sub> | ![](https://placehold.co/12x12/2DB413/2DB413.png) |
@@ -60,6 +65,59 @@ Every theme is built from the Omarchy theme with the same name. Colors are Bruce
 ./bruce-theme-gen.py unix-wordcloud       --littlefs
 ```
 </details>
+<!-- glitch:end -->
+
+---
+
+## ▌Monster collection (10)
+
+Every menu becomes a monster, drawn with a glow and dripping slime, blood or ectoplasm. The boot screen is a dripping **BRUCE** in the [Creepster](https://fonts.google.com/specimen/Creepster) horror font. Folder: [`monster/`](monster/).
+
+<img src="previews/monster/vampire-icons.png" width="600" alt="vampire icons">
+
+| Menu | Monster | Why |
+|---|---|---|
+| WiFi | 🕸️ spider web | the web you tap into |
+| BLE | 🦇 bat | a short-range flyer |
+| RF | ☢️ radioactive | it's radiation |
+| RFID | 💀 skull scan | scanning for victims |
+| FM | 👻 ghost | voices on the radio |
+| IR | 👁️ eye | sees what you can't |
+| Files | 🪦 gravestone | where things are buried |
+| GPS | 🔮 crystal ball | finds you anywhere |
+| NRF24 | 👽 alien | signals from elsewhere |
+| Interpreter | 🧪 skull potion | scripts are potions |
+| Clock | 🕯️ candle | time burning down |
+| LoRa | 🦉 owl | sees far in the dark |
+| Others | 🎃 pumpkin | the grab bag |
+| Connect | 🕷️ spider | spins the connections |
+| Config | 🪄 magic staff | bend the device to your will |
+
+<!-- monster:start -->
+| Theme | Icons | Text / dim / bg | LED |
+|---|---|---|---|
+| **`frankenstein`**<br><sub>[boot](previews/monster/frankenstein-boot.gif)</sub> | <img src="previews/monster/frankenstein-icons.png" width="420"> | ![](https://placehold.co/12x12/9CD29C/9CD29C.png) ![](https://placehold.co/12x12/5A795A/5A795A.png) ![](https://placehold.co/12x12/081410/081410.png)<br><sub>`9e93` `5bcb` `8a2`</sub> | ![](https://placehold.co/12x12/E8F000/E8F000.png) |
+| **`ghost`**<br><sub>[boot](previews/monster/ghost-boot.gif)</sub> | <img src="previews/monster/ghost-icons.png" width="420"> | ![](https://placehold.co/12x12/DEF6FF/DEF6FF.png) ![](https://placehold.co/12x12/7B91A4/7B91A4.png) ![](https://placehold.co/12x12/080C10/080C10.png)<br><sub>`dfbf` `7c94` `862`</sub> | ![](https://placehold.co/12x12/7FD8FF/7FD8FF.png) |
+| **`kraken`**<br><sub>[boot](previews/monster/kraken-boot.gif)</sub> | <img src="previews/monster/kraken-icons.png" width="420"> | ![](https://placehold.co/12x12/7BE2DE/7BE2DE.png) ![](https://placehold.co/12x12/4A8583/4A8583.png) ![](https://placehold.co/12x12/001010/001010.png)<br><sub>`7f1b` `4c30` `82`</sub> | ![](https://placehold.co/12x12/9B5CFF/9B5CFF.png) |
+| **`mummy`**<br><sub>[boot](previews/monster/mummy-boot.gif)</sub> | <img src="previews/monster/mummy-icons.png" width="420"> | ![](https://placehold.co/12x12/EEDAB4/EEDAB4.png) ![](https://placehold.co/12x12/8B856A/8B856A.png) ![](https://placehold.co/12x12/101008/101008.png)<br><sub>`eed6` `8c2d` `1081`</sub> | ![](https://placehold.co/12x12/C9A227/C9A227.png) |
+| **`pumpkin`**<br><sub>[boot](previews/monster/pumpkin-boot.gif)</sub> | <img src="previews/monster/pumpkin-icons.png" width="420"> | ![](https://placehold.co/12x12/FF8918/FF8918.png) ![](https://placehold.co/12x12/946129/946129.png) ![](https://placehold.co/12x12/100800/100800.png)<br><sub>`fc43` `9305` `1040`</sub> | ![](https://placehold.co/12x12/FFD23F/FFD23F.png) |
+| **`slime`**<br><sub>[boot](previews/monster/slime-boot.gif)</sub> | <img src="previews/monster/slime-icons.png" width="420"> | ![](https://placehold.co/12x12/B4FF39/B4FF39.png) ![](https://placehold.co/12x12/6A8D39/6A8D39.png) ![](https://placehold.co/12x12/081408/081408.png)<br><sub>`b7e7` `6c67` `8a1`</sub> | ![](https://placehold.co/12x12/7CFF00/7CFF00.png) |
+| **`vampire`**<br><sub>[boot](previews/monster/vampire-boot.gif)</sub> | <img src="previews/monster/vampire-icons.png" width="420"> | ![](https://placehold.co/12x12/F6E6E6/F6E6E6.png) ![](https://placehold.co/12x12/8B6D73/8B6D73.png) ![](https://placehold.co/12x12/100408/100408.png)<br><sub>`f73c` `8b6e` `1021`</sub> | ![](https://placehold.co/12x12/C0001F/C0001F.png) |
+| **`werewolf`**<br><sub>[boot](previews/monster/werewolf-boot.gif)</sub> | <img src="previews/monster/werewolf-icons.png" width="420"> | ![](https://placehold.co/12x12/DEDEEE/DEDEEE.png) ![](https://placehold.co/12x12/7B8194/7B8194.png) ![](https://placehold.co/12x12/080C10/080C10.png)<br><sub>`defd` `7c12` `862`</sub> | ![](https://placehold.co/12x12/D0922C/D0922C.png) |
+| **`witch`**<br><sub>[boot](previews/monster/witch-boot.gif)</sub> | <img src="previews/monster/witch-icons.png" width="420"> | ![](https://placehold.co/12x12/CDAAFF/CDAAFF.png) ![](https://placehold.co/12x12/7B659C/7B659C.png) ![](https://placehold.co/12x12/100818/100818.png)<br><sub>`cd5f` `7b33` `1043`</sub> | ![](https://placehold.co/12x12/6AFF6A/6AFF6A.png) |
+| **`zombie`**<br><sub>[boot](previews/monster/zombie-boot.gif)</sub> | <img src="previews/monster/zombie-icons.png" width="420"> | ![](https://placehold.co/12x12/BDC6A4/BDC6A4.png) ![](https://placehold.co/12x12/6A7562/6A7562.png) ![](https://placehold.co/12x12/101408/101408.png)<br><sub>`be34` `6bac` `10a1`</sub> | ![](https://placehold.co/12x12/9E1B1B/9E1B1B.png) |
+<!-- monster:end -->
+
+<details>
+<summary><b>Build the monsters</b></summary>
+
+```bash
+./bruce-monster-gen.py                     # all 10 -> monster/<name>/
+./bruce-monster-gen.py vampire --littlefs  # one monster + local/vampire-littlefs.bin
+```
+
+To add a monster, add a line to `MONSTERS` in `bruce-monster-gen.py` with `(background, text, dim text, drip, glow)` colors, then run `./tools-gallery.py`.
+</details>
 
 ---
 
@@ -70,7 +128,7 @@ Pick **one** of the three ways below.
 ### A — microSD card (easiest, lets you keep many themes)
 
 1. Format a microSD card as **FAT32**. Any size works; the themes are ~85 KB each.
-2. Copy a theme folder to the **root** of the card, e.g. `themes/japglitch/` → `SD:/japglitch/`.
+2. Copy theme folders to the **root** of the card, e.g. `themes/japglitch/` → `SD:/japglitch/` or `monster/vampire/` → `SD:/vampire/`. You can copy all of them at once.
 3. On the device: **Config → UI Theme → SD → `japglitch/japglitch.json`**.
 
 > [!NOTE]
@@ -180,6 +238,7 @@ Paths are relative to the JSON file. Supported images: BMP, JPG, PNG, GIF.
 
 Themes and generator: MIT. Bruce is © its authors ([BruceDevices/firmware](https://github.com/BruceDevices/firmware)).
 Palettes come from Omarchy themes. Icons are rendered from [Nerd Fonts](https://www.nerdfonts.com) Material Design glyphs.
+The monster collection uses [Creepster](https://fonts.google.com/specimen/Creepster) by Sideshow (SIL Open Font License, see [`fonts/OFL.txt`](fonts/OFL.txt)).
 
 <sub>▚▞▚▞ made on Omarchy, tested on a real Cheap Yellow Display ▞▚▞▚</sub>
 
