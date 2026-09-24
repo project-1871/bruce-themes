@@ -1678,6 +1678,59 @@ THEMES.update({
 })
 
 
+# ── rad-adventure: bright flat cartoon ──
+ADV = dict(bg="7FD3F7", text="1E2A5A", dim="2E6FA8", led="FFD23F",
+           colors=["FF8EC7", "FFD23F", "4FC3F7", "8BD450", "B388FF", "FF9A3C"],
+           icons=icons(others=0xF04E5, config=0xF01A5, interpreter=0xF1970, lora=0xF0531, connect=0xF0A43,
+                       files=0xF0E10, clock=0xF0ba4))
+NAVY = (30, 42, 90)
+
+
+def hills(d, W, H, top, cols=((120, 200, 80), (92, 176, 62))):
+    d.ellipse([-W * 0.3, top, W * 0.7, top + H], fill=cols[1])
+    d.ellipse([W * 0.35, top + 10, W * 1.3, top + H], fill=cols[0])
+
+
+def adv_icon(key, S, t):
+    img = solid((S, S), hexrgb(t["bg"])); d = ImageDraw.Draw(img)
+    hills(d, S, S, int(S * 0.72))
+    col = cycle(t, key); c, r = S // 2, int(S * 0.36)
+    d.ellipse([c - r + 3, c - r + 6, c + r + 3, c + r + 6], fill=(40, 90, 50))       # flat shadow on the grass
+    d.ellipse([c - r, c - r, c + r, c + r], fill=col, outline=NAVY, width=5)          # chunky outlined badge
+    d.arc([c - r + 10, c - r + 10, c + r - 10, c + r - 10], 200, 250, fill=(255, 255, 255), width=5)  # shine
+    m = mask_of(t, key, S, 0.4)
+    paint(img, m.filter(ImageFilter.MaxFilter(7)), NAVY); paint(img, m, (255, 255, 255))
+    return img
+
+
+def adv_boot(W, H, t):
+    f = ImageFont.truetype(str(BUBBLY), 72); f.set_variation_by_axes([700, 100])
+    s = ImageFont.truetype(str(BUBBLY), 26); s.set_variation_by_axes([700, 100])
+    frames = []
+    for i in range(9):
+        img = metal((W, H), hexrgb("BDEBFF"), hexrgb("7FD3F7"), hexrgb("4FB8EA")); d = ImageDraw.Draw(img)
+        d.ellipse([22, 16, 70, 64], fill=(255, 226, 90), outline=(255, 190, 40), width=4)   # sun
+        for cx, cy in ((110, 40), (240, 28)):  # clouds
+            for dx, r in ((-18, 14), (0, 20), (18, 14)): d.ellipse([cx + dx - r, cy - r + (4 if dx else 0), cx + dx + r, cy + r], fill=(255, 255, 255))
+        hills(d, W, H, 150)
+        d.rectangle([250, 110, 266, 190], fill=(140, 90, 50), outline=NAVY, width=3)          # big tree
+        d.ellipse([214, 50, 302, 130], fill=(92, 176, 62), outline=NAVY, width=4)
+        d.rectangle([248, 150, 268, 170], fill=(255, 226, 90), outline=NAVY, width=2)        # treehouse window
+        bounce = [0, -14, -22, -14, 0, -6, 0, -2, 0][i]
+        m = text_mask((W, H), (W // 2 - 20, 104 + bounce), "BRUCE", f)
+        paint(img, m.filter(ImageFilter.MaxFilter(11)), NAVY, (3, 5))
+        paint(img, m.filter(ImageFilter.MaxFilter(11)), NAVY)
+        paint(img, m, (255, 255, 255))
+        if i >= 6:
+            d = ImageDraw.Draw(img)
+            d.text((W // 2 - 20, 196), "Mathematical!", font=s, fill=hexrgb("FFD23F"), anchor="mm", stroke_width=4, stroke_fill=NAVY)
+        frames.append(q(img, 48))
+    return frames
+
+
+THEMES["rad-adventure"] = (ADV, adv_icon, adv_boot)
+
+
 def littlefs_image(theme_dir, name, size=0x30000, block=4096):
     """Build a LittleFS image holding the theme + a bruce.conf selecting it. Returns (bytes, used_blocks) or None if full."""
     from littlefs import LittleFS, errors

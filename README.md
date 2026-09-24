@@ -11,9 +11,9 @@ glitch themes generated from [Omarchy](https://omarchy.org) desktop palettes, dr
 
 <img src="previews/pop/gallery.gif" width="820" alt="Pop collection boot animations">
 
-`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `55 themes` · `each fits in 192 KB of LittleFS`
+`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `56 themes` · `each fits in 192 KB of LittleFS`
 
-**[▚ Glitch collection](#glitch-collection-16)** · **[🦇 Monster collection](#monster-collection-10)** · **[🎮 Pop collection](#pop-collection-29)** · **[Install](#install)** · **[Make your own](#generate-a-theme-from-any-omarchy-palette)**
+**[▚ Glitch collection](#glitch-collection-16)** · **[🦇 Monster collection](#monster-collection-10)** · **[🎮 Pop collection](#pop-collection-30)** · **[Install](#install)** · **[Make your own](#generate-a-theme-from-any-omarchy-palette)**
 
 </div>
 
@@ -123,7 +123,7 @@ To add a monster, add a line to `MONSTERS` in `bruce-monster-gen.py` with `(back
 
 ---
 
-## ▌Pop collection (29)
+## ▌Pop collection (30)
 
 Tributes to games, movies, cartoons and genres, each with its own art style instead of a shared effect. The build shrinks JPG quality automatically until every theme fits the CYD's 192 KB internal storage. Folder: [`pop/`](pop/).
 
@@ -158,6 +158,7 @@ Tributes to games, movies, cartoons and genres, each with its own art style inst
 | **`dimension-hop`** | portal-hopping sci-fi cartoons | White icons in front of swirling green portals | A green portal spirals open, then a wobbly BRUCE and *\*burp\* ...let's go.* |
 | **`tiny-invader`** | alien-invader cartoons | Hot-pink alien-tech glow on a black hexagon grid | Pink circuit traces power up, then BRUCE and *ALL HAIL BRUCE* |
 | **`couch-critics`** | 90s couch-potato cartoons | Scribbly black marker outlines on flat yellow, blue, orange and green | An old wooden TV shows static, then a scribbled BRUCE and *heh heh. this rocks.* |
+| **`rad-adventure`** | candy-coloured adventure cartoons | Chunky round badges with thick navy outlines over green hills: sword, crown, candy, dog, backpack, tree, hat | BRUCE bounces in over rolling hills with a sun, clouds and a big treehouse tree, then *Mathematical!* |
 
 <!-- pop:start -->
 | Theme | Icons | Text / dim / bg | LED |
@@ -178,6 +179,7 @@ Tributes to games, movies, cartoons and genres, each with its own art style inst
 | **`maze-chomper`**<br><sub>[boot](previews/pop/maze-chomper-boot.gif)</sub> | <img src="previews/pop/maze-chomper-icons.png" width="420"> | ![](https://placehold.co/12x12/FFE200/FFE200.png) ![](https://placehold.co/12x12/2020DE/2020DE.png) ![](https://placehold.co/12x12/000000/000000.png)<br><sub>`ff00` `211b` `0`</sub> | ![](https://placehold.co/12x12/FFE000/FFE000.png) |
 | **`p-cat`**<br><sub>[boot](previews/pop/p-cat-boot.gif)</sub> | <img src="previews/pop/p-cat-icons.png" width="420"> | ![](https://placehold.co/12x12/D50018/D50018.png) ![](https://placehold.co/12x12/B4657B/B4657B.png) ![](https://placehold.co/12x12/FFDEEE/FFDEEE.png)<br><sub>`d003` `b32f` `fefd`</sub> | ![](https://placehold.co/12x12/FF4F8B/FF4F8B.png) |
 | **`pixel-plumber`**<br><sub>[boot](previews/pop/pixel-plumber-boot.gif)</sub> | <img src="previews/pop/pixel-plumber-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFFFF/FFFFFF.png) ![](https://placehold.co/12x12/183C9C/183C9C.png) ![](https://placehold.co/12x12/5A95FF/5A95FF.png)<br><sub>`ffff` `19f3` `5cbf`</sub> | ![](https://placehold.co/12x12/E40058/E40058.png) |
+| **`rad-adventure`**<br><sub>[boot](previews/pop/rad-adventure-boot.gif)</sub> | <img src="previews/pop/rad-adventure-icons.png" width="420"> | ![](https://placehold.co/12x12/18285A/18285A.png) ![](https://placehold.co/12x12/296DAC/296DAC.png) ![](https://placehold.co/12x12/7BD2F6/7BD2F6.png)<br><sub>`194b` `2b75` `7e9e`</sub> | ![](https://placehold.co/12x12/FFD23F/FFD23F.png) |
 | **`rainbow-pony`**<br><sub>[boot](previews/pop/rainbow-pony-boot.gif)</sub> | <img src="previews/pop/rainbow-pony-icons.png" width="420"> | ![](https://placehold.co/12x12/9C4CCD/9C4CCD.png) ![](https://placehold.co/12x12/BD8DD5/BD8DD5.png) ![](https://placehold.co/12x12/F6EAFF/F6EAFF.png)<br><sub>`9a79` `bc7a` `f75f`</sub> | ![](https://placehold.co/12x12/FF7EB9/FF7EB9.png) |
 | **`soul-battle`**<br><sub>[boot](previews/pop/soul-battle-boot.gif)</sub> | <img src="previews/pop/soul-battle-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFFFF/FFFFFF.png) ![](https://placehold.co/12x12/FF8D00/FF8D00.png) ![](https://placehold.co/12x12/000000/000000.png)<br><sub>`ffff` `fc60` `0`</sub> | ![](https://placehold.co/12x12/FF0000/FF0000.png) |
 | **`space-crawl`**<br><sub>[boot](previews/pop/space-crawl-boot.gif)</sub> | <img src="previews/pop/space-crawl-icons.png" width="420"> | ![](https://placehold.co/12x12/FFEA18/FFEA18.png) ![](https://placehold.co/12x12/4AA5FF/4AA5FF.png) ![](https://placehold.co/12x12/000000/000000.png)<br><sub>`ff43` `4d3f` `0`</sub> | ![](https://placehold.co/12x12/FFE81F/FFE81F.png) |
