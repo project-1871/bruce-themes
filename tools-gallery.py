@@ -80,5 +80,7 @@ readme = re.sub(r"`\d+ themes`", f"`{len(glitch) + len(monster) + len(pop)} them
 readme = re.sub(r"(## ▌Glitch collection )\(\d+\)", rf"\g<1>({len(glitch)})", readme)
 readme = re.sub(r"(## ▌Monster collection )\(\d+\)", rf"\g<1>({len(monster)})", readme)
 readme = re.sub(r"(## ▌Pop collection )\(\d+\)", rf"\g<1>({len(pop)})", readme)
+for key, n in (("glitch", len(glitch)), ("monster", len(monster)), ("pop", len(pop))):  # keep nav anchors in sync
+    readme = re.sub(rf"\(#{key}-collection-\d+\)", f"(#{key}-collection-{n})", readme)
 (ROOT / "README.md").write_text(readme)
 print(f"{len(glitch)} glitch + {len(monster)} monster + {len(pop)} pop themes")

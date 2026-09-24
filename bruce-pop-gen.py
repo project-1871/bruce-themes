@@ -5,11 +5,14 @@
   hero-quest     8-bit pixel art: gold/green/blue sprites on a dark forest, heart-meter boot
   pixel-plumber  8-bit pixel art: bright sprites on sky blue, brick ground + ? blocks boot
   code-rain      green katakana code rain behind glowing icons, rain resolves into the title
+  steampunk      engraved brass/copper icons with rivets on dark leather, turning gears boot
+  comic-hero     halftone comic panels with thick ink outlines, BRUCE! starburst boot with POW/ZAP
+  alien-arcade   80s arcade shooter: pixel icons on a starfield, marching original aliens boot
 
 Inspired by classic pop culture. All art is drawn here from generic icon glyphs and shapes:
 no official artwork, sprites or logos.
 
-Usage: ./bruce-pop-gen.py [p-cat hero-quest pixel-plumber code-rain] [--littlefs]
+Usage: ./bruce-pop-gen.py [theme ...] [--littlefs]
 """
 import argparse, json, random, sys
 from pathlib import Path
@@ -277,11 +280,252 @@ def rain_boot(W, H, t):
     return frames
 
 
+# ───────────────────────── steampunk: brass & gears ─────────────────────────
+VICTORIAN = ROOT / "fonts" / "CinzelDecorative-Bold.ttf"
+STEAM = dict(
+    bg="1E140C", text="E8C170", dim="8A6A3E", led="D4892A",
+    metals=[("FFE7A3", "B8862B", "5C3D12"), ("FFC9A0", "B8652B", "5A2A10"), ("F2F2E0", "A89F7A", "4F4A38")],
+    icons={"wifi": 0xF001C, "ble": 0xF0210, "rf": 0xF029A, "rfid": 0xF030B, "fm": 0xF009A, "ir": 0xF0349,
+           "files": 0xF0A6A, "gps": 0xF1382, "nrf": 0xF0347, "interpreter": 0xF14F7, "clock": 0xF1442,
+           "lora": 0xF0B4E, "others": 0xF0BA4, "connect": 0xF052C, "config": 0xF08D6})
+
+
+def gear_mask(size, r_out, teeth, angle, hole=0.28, spokes=5):
+    """A cog as an L mask, centred, rotated by angle (radians)."""
+    import math
+    m = Image.new("L", (size, size), 0)
+    d = ImageDraw.Draw(m)
+    c, r_in = size / 2, r_out * 0.80
+    pts = []
+    for i in range(teeth * 4):
+        a = angle + i * math.pi * 2 / (teeth * 4)
+        r = r_out if i % 4 in (1, 2) else r_in
+        pts.append((c + r * math.cos(a), c + r * math.sin(a)))
+    d.polygon(pts, fill=255)
+    rim = r_in * 0.78
+    d.ellipse([c - rim, c - rim, c + rim, c + rim], fill=0)
+    for k in range(spokes):  # spokes
+        a = angle + k * math.pi * 2 / spokes
+        d.line([(c, c), (c + rim * math.cos(a), c + rim * math.sin(a))], fill=255, width=max(2, int(r_out * 0.16)))
+    h = r_out * hole
+    d.ellipse([c - h, c - h, c + h, c + h], fill=255)
+    d.ellipse([c - h / 2, c - h / 2, c + h / 2, c + h / 2], fill=0)
+    return m
+
+
+def metal(size, light, mid, dark):
+    """Vertical brushed-metal gradient."""
+    W, H = size
+    g = Image.new("RGB", (1, H))
+    for y in range(H):
+        v = y / max(1, H - 1)
+        a, b, t = (light, mid, v / 0.45) if v < 0.45 else (mid, dark, (v - 0.45) / 0.55)
+        g.putpixel((0, y), tuple(int(a[i] + (b[i] - a[i]) * min(1, t)) for i in range(3)))
+    return g.resize((W, H))
+
+
+def steam_icon(key, S, t):
+    import math
+    rnd = random.Random("steam-" + key)
+    bg = hexrgb(t["bg"])
+    img = solid((S, S), bg)
+    wm = gear_mask(S * 2, S * 0.9, 12, rnd.random())  # faint gear watermark in a corner
+    wm = wm.crop((S // 2 + rnd.choice([-40, 40]), S // 2 + rnd.choice([-40, 40]), S // 2 + S + rnd.choice([-40, 40]),
+                  S // 2 + S + rnd.choice([-40, 40]))).resize((S, S))
+    img.paste(solid((S, S), tuple(min(255, c + 14) for c in bg)), (0, 0), wm)
+    light, mid, dark = (hexrgb(c) for c in rnd.choice(t["metals"]))
+    m = glyph_mask(t["icons"][key], int(S * 0.58), S)
+    rim = m.filter(ImageFilter.MaxFilter(7))
+    img.paste(solid((S, S), (0, 0, 0)), (3, 4), rim)                      # drop shadow
+    img.paste(solid((S, S), tuple(c // 2 for c in dark)), (0, 0), rim)    # dark bezel
+    img.paste(metal((S, S), light, mid, dark), (0, 0), m)                 # brass body
+    d = ImageDraw.Draw(img)
+    for x, y in ((9, 9), (S - 10, 9), (9, S - 10), (S - 10, S - 10)):     # corner rivets
+        d.ellipse([x - 4, y - 4, x + 4, y + 4], fill=mid, outline=dark)
+        d.point((x - 1, y - 1), fill=light)
+    return img
+
+
+def steam_boot(W, H, t):
+    import math
+    bg = hexrgb(t["bg"])
+    brass = [hexrgb(c) for c in t["metals"][0]]
+    copper = [hexrgb(c) for c in t["metals"][1]]
+    f = ImageFont.truetype(str(VICTORIAN), 44)
+    small = ImageFont.truetype(str(VICTORIAN), 13)
+    gears = [(70, 60, 58, 12, 1, brass), (150, 40, 34, 7, -12 / 7, copper), (262, 190, 64, 14, 12 / 14, copper),
+             (205, 225, 30, 6, -14 / 6, brass)]
+    frames = []
+    for i in range(8):
+        img = solid((W, H), bg)
+        for cx, cy, r, teeth, ratio, (l, m_, dk) in gears:
+            step = (math.pi * 2 / 12) * i / 8  # one tooth of the big gear over the loop
+            gm = gear_mask(int(r * 2.2), r, teeth, step * ratio)
+            x, y = int(cx - gm.width / 2), int(cy - gm.height / 2)
+            img.paste(solid(gm.size, (0, 0, 0)), (x + 3, y + 4), gm)
+            img.paste(metal(gm.size, l, m_, dk), (x, y), gm)
+        d = ImageDraw.Draw(img)
+        d.rounded_rectangle([34, 88, W - 34, 158], radius=10, fill=brass[1], outline=brass[2], width=3)  # plaque
+        d.rounded_rectangle([40, 94, W - 40, 152], radius=7, outline=brass[0], width=1)
+        for x in (46, W - 46):
+            for y in (100, 146): d.ellipse([x - 3, y - 3, x + 3, y + 3], fill=brass[2])
+        d.text((W // 2 + 2, 124 + 2), "BRUCE", font=f, fill=brass[2], anchor="mm")
+        d.text((W // 2, 124), "BRUCE", font=f, fill=(40, 24, 8), anchor="mm")
+        if i >= 5: d.text((W // 2, 176), "~ patent pending ~", font=small, fill=hexrgb(t["text"]), anchor="mm")
+        for k in range(3):  # steam puffs
+            px, py = 150 + k * 9, 14 - ((i * 3 + k * 5) % 14)
+            d.ellipse([px - 6, py - 4, px + 6, py + 4], fill=(90, 80, 70))
+        frames.append(img.quantize(48, dither=Image.Dither.NONE))
+    return frames
+
+
+# ───────────────────────── comic-hero: halftone comic book ─────────────────────────
+COMIC_FONT = ROOT / "fonts" / "Bangers-Regular.ttf"
+COMIC = dict(
+    bg="FFF4D6", text="111111", dim="8A6A4A", led="E23636",
+    panels=[("F7D117", "F29B12"), ("2E86DE", "7CB8F5"), ("E23636", "F58A8A"), ("35C46A", "9BE8B5")],
+    fills=["FFFFFF", "F7D117", "E23636", "2E86DE"],
+    icons={"wifi": 0xF0437, "ble": 0xF0AE2, "rf": 0xF0241, "rfid": 0xF113B, "fm": 0xF0D02, "ir": 0xF0B94,
+           "files": 0xF14F7, "gps": 0xF04FE, "nrf": 0xF0768, "interpreter": 0xF06A9, "clock": 0xF1442,
+           "lora": 0xF0471, "others": 0xF11EA, "connect": 0xF0FD7, "config": 0xF08EA})
+
+
+def halftone(size, base, dot, step=11, r=3):
+    img = solid(size, base)
+    d = ImageDraw.Draw(img)
+    for y in range(0, size[1] + step, step):
+        for x in range((y // step % 2) * step // 2, size[0] + step, step):
+            d.ellipse([x - r, y - r, x + r, y + r], fill=dot)
+    return img
+
+
+def burst(cx, cy, r_out, r_in, points, angle=0):
+    import math
+    return [(cx + (r_out if i % 2 == 0 else r_in) * math.cos(angle + i * math.pi / points),
+             cy + (r_out if i % 2 == 0 else r_in) * math.sin(angle + i * math.pi / points)) for i in range(points * 2)]
+
+
+def comic_icon(key, S, t):
+    rnd = random.Random("comic-" + key)
+    base, dot = (hexrgb(c) for c in rnd.choice(t["panels"]))
+    img = halftone((S, S), base, dot, step=15, r=3)
+    fill = hexrgb(rnd.choice([c for c in t["fills"] if hexrgb(c) != base]))
+    m = glyph_mask(t["icons"][key], int(S * 0.56), S)
+    ink = m.filter(ImageFilter.MaxFilter(9))
+    img.paste(solid((S, S), (17, 17, 17)), (5, 6), ink)   # offset ink shadow
+    img.paste(solid((S, S), (17, 17, 17)), (0, 0), ink)   # thick outline
+    img.paste(solid((S, S), fill), (0, 0), m)
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, S - 1, S - 1], outline=(17, 17, 17), width=4)  # panel border
+    return img
+
+
+def comic_boot(W, H, t):
+    f = ImageFont.truetype(str(COMIC_FONT), 78)
+    sfx = ImageFont.truetype(str(COMIC_FONT), 30)
+    ink = (17, 17, 17)
+    frames = []
+    for i in range(8):
+        img = halftone((W, H), hexrgb("E23636"), hexrgb("F58A8A"), 18, 4)
+        d = ImageDraw.Draw(img)
+        d.polygon(burst(W // 2 + 4, H // 2 + 5, 150, 95, 14), fill=ink)
+        d.polygon(burst(W // 2, H // 2, 150, 95, 14), fill=hexrgb("F7D117"), outline=ink)
+        if i >= 1:
+            shake = [(0, 0), (5, -4), (-4, 3), (2, -1)][min(i - 1, 3)] if i < 5 else (0, 0)
+            m = Image.new("L", (W, H), 0)
+            ImageDraw.Draw(m).text((W // 2 + shake[0], H // 2 + shake[1]), "BRUCE!", font=f, fill=255, anchor="mm")
+            img.paste(solid((W, H), ink), (4, 5), m.filter(ImageFilter.MaxFilter(7)))
+            img.paste(solid((W, H), ink), (0, 0), m.filter(ImageFilter.MaxFilter(7)))
+            img.paste(solid((W, H), (255, 255, 255)), (0, 0), m)
+        if i >= 5:
+            for (x, y, word, col, ang) in ((52, 36, "POW!", "2E86DE", -0.3), (268, 206, "ZAP!", "35C46A", 0.25)):
+                d = ImageDraw.Draw(img)
+                d.polygon(burst(x, y, 40, 26, 9, ang), fill=(255, 255, 255), outline=ink)
+                d.text((x, y), word, font=sfx, fill=hexrgb(col), anchor="mm", stroke_width=2, stroke_fill=ink)
+        frames.append(img.quantize(12, dither=Image.Dither.NONE))
+    return frames
+
+
+# ───────────────────────── alien-arcade: 80s arcade shooter ─────────────────────────
+ARCADE = dict(
+    bg="000000", text="FFFFFF", dim="20FF20", led="20FF20", grid=26,
+    colors=["FFFFFF", "20FF20", "20E0FF", "FF40FF", "FFE020"],
+    icons={"wifi": 0xF0437, "ble": 0xF10C4, "rf": 0xF140B, "rfid": 0xF030B, "fm": 0xF07F4, "ir": 0xF0208,
+           "files": 0xF0A6A, "gps": 0xF05DD, "nrf": 0xF089A, "interpreter": 0xF0EB5, "clock": 0xF1442,
+           "lora": 0xF0463, "others": 0xF1741, "connect": 0xF01E7, "config": 0xF0493})
+# original alien designs (not the arcade classics): a tentacled jelly and a one-eyed walker, two frames each
+JELLY = [["...XXXXX...", ".XXXXXXXXX.", "XX..XXX..XX", "XXXXXXXXXXX", ".X.X.X.X.X.", "X.X.X.X.X.X"],
+         ["...XXXXX...", ".XXXXXXXXX.", "XX..XXX..XX", "XXXXXXXXXXX", "X.X.X.X.X.X", ".X.X.X.X.X."]]
+CYCLOPS = [["....XXX....", "..XXXXXXX..", ".XXX...XXX.", ".XXX.X.XXX.", ".XXX...XXX.", "..XXXXXXX..", ".X..X.X..X.", "X...X.X...X"],
+           ["....XXX....", "..XXXXXXX..", ".XXX...XXX.", ".XXX.X.XXX.", ".XXX...XXX.", "..XXXXXXX..", "..X.X.X.X..", ".X..X.X..X."]]
+CANNON = [".....X.....", "....XXX....", ".XXXXXXXXX.", "XXXXXXXXXXX", "XXXXXXXXXXX"]
+
+
+def draw_bits(d, rows, x, y, px, color):
+    for j, row in enumerate(rows):
+        for i, ch in enumerate(row):
+            if ch == "X": d.rectangle([x + i * px, y + j * px, x + (i + 1) * px - 1, y + (j + 1) * px - 1], fill=color)
+
+
+def scanlines(img, every=3, factor=0.72):
+    px = img.load()
+    for y in range(0, img.height, every):
+        for x in range(img.width):
+            r, g, b = px[x, y][:3]
+            px[x, y] = (int(r * factor), int(g * factor), int(b * factor))
+    return img
+
+
+def arcade_icon(key, S, t):
+    rnd = random.Random("arcade-" + key)
+    g = t["grid"]
+    cells = pixelate(glyph_mask(t["icons"][key], int(S * 0.62), S, yfrac=0.5), g)
+    col = hexrgb(rnd.choice(t["colors"]))
+    hi = tuple(min(255, c + 90) for c in col)
+    spr = sprite(cells, col, hi, (0, 0, 0), g).resize((S, S), Image.NEAREST)
+    img = solid((S, S), (0, 0, 0))
+    d = ImageDraw.Draw(img)
+    for _ in range(9):  # starfield
+        x, y = rnd.randrange(S), rnd.randrange(S)
+        d.point((x, y), fill=(rnd.randint(90, 200),) * 3)
+    img.paste(spr, (0, 0), spr)
+    return img
+
+
+def arcade_boot(W, H, t):
+    f = ImageFont.truetype(str(PIXEL), 34)
+    small = ImageFont.truetype(str(PIXEL), 10)
+    rnd = random.Random(5)
+    stars = [(rnd.randrange(W), rnd.randrange(H)) for _ in range(40)]
+    frames = []
+    for i in range(8):
+        img = solid((W, H), (0, 0, 0))
+        d = ImageDraw.Draw(img)
+        for x, y in stars: d.point((x, (y + i * 2) % H), fill=(110, 110, 130))
+        d.text((8, 8), "SCORE 1337", font=small, fill=(255, 255, 255))
+        d.text((W - 8, 8), "HI 9999", font=small, fill=(255, 255, 255), anchor="ra")
+        d.text((W // 2, 50), "BRUCE", font=f, fill=hexrgb("20FF20"), anchor="mm")
+        march = (i % 4) * 4 - 6
+        for row, (shape, col) in enumerate(((CYCLOPS, "FF40FF"), (JELLY, "20E0FF"), (JELLY, "20E0FF"))):
+            for k in range(6):
+                draw_bits(d, shape[i % 2], 40 + k * 42 + march, 82 + row * 26, 2, hexrgb(col))
+        cx = 60 + i * 26
+        draw_bits(d, CANNON, cx, 208, 2, hexrgb("20FF20"))
+        if i % 2 == 0: d.rectangle([cx + 10, 150, cx + 11, 200], fill=(255, 255, 255))  # laser
+        d.line([(0, 222), (W, 222)], fill=hexrgb("20FF20"), width=2)
+        if i % 2: d.text((W // 2, 232), "INSERT COIN", font=small, fill=(255, 224, 32), anchor="mm")
+        frames.append(scanlines(img).quantize(16, dither=Image.Dither.NONE))
+    return frames
+
+
 THEMES = {
     "p-cat": (PCAT, pcat_icon, pcat_boot),
     "hero-quest": (HERO, lambda k, S, t: pixel_icon(k, S, t, "hero"), hero_boot),
     "pixel-plumber": (PLUMBER, lambda k, S, t: pixel_icon(k, S, t, "plumber"), plumber_boot),
     "code-rain": (RAIN, rain_icon, rain_boot),
+    "steampunk": (STEAM, steam_icon, steam_boot),
+    "comic-hero": (COMIC, comic_icon, comic_boot),
+    "alien-arcade": (ARCADE, arcade_icon, arcade_boot),
 }
 
 
@@ -306,7 +550,7 @@ def build(name, a):
     W, H, S = 320, 240, 132
     out = a.out / name
     out.mkdir(parents=True, exist_ok=True)
-    pixel = name in ("hero-quest", "pixel-plumber")
+    pixel = name in ("hero-quest", "pixel-plumber", "alien-arcade")
     for key in MENUS:
         icon_fn(key, S, t).convert("RGB").save(out / f"{key}.jpg", quality=90 if pixel else 82,
                                                subsampling=0 if pixel else 2)
