@@ -9,6 +9,7 @@
   comic-hero     halftone comic panels with thick ink outlines, BRUCE! starburst boot with POW/ZAP
   alien-arcade   80s arcade shooter: pixel icons on a starfield, marching original aliens boot
   rainbow-pony   glossy pastel badges with sparkles, rainbow-sweep boot with a unicorn
+  wild-encounter 4-shade green handheld pixel art in menu boxes, battle-screen boot with an original chip creature
 
 Inspired by classic pop culture. All art is drawn here from generic icon glyphs and shapes:
 no official artwork, sprites or logos.
@@ -593,6 +594,87 @@ def pony_boot(W, H, t):
     return frames
 
 
+# ───────────────────────── wild-encounter: 4-shade handheld monster game ─────────────────────────
+DMG = ["9BBC0F", "8BAC0F", "306230", "0F380F"]  # lightest -> darkest, classic green handheld LCD
+WILD = dict(
+    bg=DMG[0], text=DMG[3], dim=DMG[2], led="40FF40", grid=26,
+    icons={"wifi": 0xF05A9, "ble": 0xF15C6, "rf": 0xF140B, "rfid": 0xF0516, "fm": 0xF0387, "ir": 0xF0238,
+           "files": 0xF0E10, "gps": 0xF034D, "nrf": 0xF058C, "interpreter": 0xF0AAF, "clock": 0xF0F65,
+           "lora": 0xF0508, "others": 0xF03E9, "connect": 0xF04E1, "config": 0xF1130})
+# the "wild BRUCE": an original microchip creature with pin legs (not from any game)
+CHIP = ["....X..X..X..X..X.....",
+        "....X..X..X..X..X.....",
+        "..XXXXXXXXXXXXXXXXX...",
+        "..X...............X...",
+        "XXX..OO......OO...XXX.",
+        "..X..OO......OO...X...",
+        "XXX...............XXX.",
+        "..X.....XXXXX.....X...",
+        "XXX......XXX......XXX.",
+        "..X...............X...",
+        "XXX...X.......X...XXX.",
+        "..XXXXXXXXXXXXXXXXX...",
+        "....X..X..X..X..X.....",
+        "...XX.XX..X..XX.XX...."]
+
+
+def wild_icon(key, S, t):
+    g = t["grid"]
+    c = [hexrgb(x) for x in DMG]
+    cells = pixelate(glyph_mask(t["icons"][key], int(S * 0.58), S, yfrac=0.5), g)
+    spr = sprite(cells, c[2], c[2], c[3], g).resize((S, S), Image.NEAREST)  # solid fill reads best at 4 shades
+    img = solid((S, S), c[0])
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle([5, 5, S - 6, S - 6], radius=8, outline=c[3], width=4)   # menu-box frame
+    d.rounded_rectangle([11, 11, S - 12, S - 12], radius=4, outline=c[1], width=2)
+    img.paste(spr, (0, 0), spr)
+    return img
+
+
+def wild_boot(W, H, t):
+    c = [hexrgb(x) for x in DMG]
+    w, h = W // 2, H // 2  # draw at handheld-ish resolution, scale up 2x
+    f = ImageFont.truetype(str(PIXEL), 8)
+
+    def hp_box(d, x, y, name, lvl, frac, player=False):
+        d.text((x, y), name, font=f, fill=c[3])
+        d.text((x + 46, y), lvl, font=f, fill=c[3])
+        d.text((x, y + 11), "HP", font=f, fill=c[3])
+        d.rectangle([x + 18, y + 12, x + 66, y + 16], outline=c[3])
+        d.rectangle([x + 19, y + 13, x + 19 + int(46 * frac), y + 15], fill=c[2])
+        edge = x - 3 if player else x + 72  # the little bracket frame on the inner side
+        d.line([(x - 3, y + 21), (x + 72, y + 21)], fill=c[3])
+        d.line([(edge, y + 5), (edge, y + 21)], fill=c[3])
+
+    frames, lines = [], ("A wild BRUCE", "appeared!")
+    for i in range(10):
+        img = solid((w, h), c[0])
+        d = ImageDraw.Draw(img)
+        if i == 0:  # encounter flash
+            img = solid((w, h), c[3])
+        elif i == 1:  # stripe wipe
+            for y in range(0, h, 8): d.rectangle([0, y, w, y + 3], fill=c[3])
+        else:
+            slide = max(0, 90 - (i - 2) * 45)
+            ox = 104 + slide
+            d.ellipse([ox - 4, 42, ox + 44, 50], fill=c[1])  # ground shadow under the creature
+            for yy, row in enumerate(CHIP):
+                for xx, ch in enumerate(row):
+                    if ch == "X": d.rectangle([ox + xx * 2, 12 + yy * 2, ox + xx * 2 + 1, 12 + yy * 2 + 1], fill=c[3])
+                    elif ch == "O": d.rectangle([ox + xx * 2, 12 + yy * 2, ox + xx * 2 + 1, 12 + yy * 2 + 1], fill=c[2])
+            if i >= 3:
+                hp_box(d, 5, 5, "BRUCE", ":L99", 1.0)
+                hp_box(d, 82, 58, "CYD", ":L42", 0.62, player=True)
+            d.rectangle([0, 84, w - 1, h - 1], fill=c[0])
+            d.rectangle([2, 86, w - 3, h - 3], outline=c[3], width=2)  # dialog box
+            n = max(0, (i - 4) * 6)
+            d.text((10, 95), lines[0][:n], font=f, fill=c[3])
+            d.text((10, 107), lines[1][:max(0, n - len(lines[0]))], font=f, fill=c[3])
+            if i >= 9: d.polygon([(w - 14, 108), (w - 8, 108), (w - 11, 112)], fill=c[3])  # "next" arrow
+        frames.append(img.resize((W, H), Image.NEAREST).quantize(4, dither=Image.Dither.NONE))
+    return frames
+
+
 THEMES = {
     "p-cat": (PCAT, pcat_icon, pcat_boot),
     "hero-quest": (HERO, lambda k, S, t: pixel_icon(k, S, t, "hero"), hero_boot),
@@ -602,6 +684,7 @@ THEMES = {
     "comic-hero": (COMIC, comic_icon, comic_boot),
     "alien-arcade": (ARCADE, arcade_icon, arcade_boot),
     "rainbow-pony": (PONY, pony_icon, pony_boot),
+    "wild-encounter": (WILD, wild_icon, wild_boot),
 }
 
 
@@ -626,7 +709,7 @@ def build(name, a):
     W, H, S = 320, 240, 132
     out = a.out / name
     out.mkdir(parents=True, exist_ok=True)
-    pixel = name in ("hero-quest", "pixel-plumber", "alien-arcade")
+    pixel = name in ("hero-quest", "pixel-plumber", "alien-arcade", "wild-encounter")
     for key in MENUS:
         icon_fn(key, S, t).convert("RGB").save(out / f"{key}.jpg", quality=90 if pixel else 82,
                                                subsampling=0 if pixel else 2)

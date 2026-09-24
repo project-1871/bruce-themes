@@ -11,9 +11,9 @@ glitch themes generated from [Omarchy](https://omarchy.org) desktop palettes, dr
 
 <img src="previews/pop/gallery.gif" width="820" alt="Pop collection boot animations">
 
-`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `34 themes` · `each fits in 192 KB of LittleFS`
+`320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `35 themes` · `each fits in 192 KB of LittleFS`
 
-**[▚ Glitch collection](#glitch-collection-16)** · **[🦇 Monster collection](#monster-collection-10)** · **[🎮 Pop collection](#pop-collection-8)** · **[Install](#install)** · **[Make your own](#generate-a-theme-from-any-omarchy-palette)**
+**[▚ Glitch collection](#glitch-collection-16)** · **[🦇 Monster collection](#monster-collection-10)** · **[🎮 Pop collection](#pop-collection-9)** · **[Install](#install)** · **[Make your own](#generate-a-theme-from-any-omarchy-palette)**
 
 </div>
 
@@ -123,7 +123,7 @@ To add a monster, add a line to `MONSTERS` in `bruce-monster-gen.py` with `(back
 
 ---
 
-## ▌Pop collection (8)
+## ▌Pop collection (9)
 
 Tributes to pop culture and genres, each with its own art style instead of a shared effect. Folder: [`pop/`](pop/).
 
@@ -137,6 +137,7 @@ Tributes to pop culture and genres, each with its own art style instead of a sha
 | **`comic-hero`** | superhero comic books | Halftone comic panels with thick ink outlines: radar, shield star, lightning, drama masks, atom, robot, spider, flexed arm, hammer | **BRUCE!** in [Bangers](https://fonts.google.com/specimen/Bangers) shakes onto a starburst, then *POW!* and *ZAP!* bubbles pop in |
 | **`alien-arcade`** | 80s arcade shooters | Neon pixel sprites on a starfield: radar, UFO, TV, safe, bullseye, alien, joystick pad, rocket, shooting star, earth | Original pixel aliens march in formation over a laser cannon, with a *SCORE / HI* bar and blinking *INSERT COIN* |
 | **`rainbow-pony`** | magical cartoon ponies | Glossy pastel badges with a shine and sparkles: cloud, butterfly, magic wand, gem, treble clef, firework, balloon, cupcake, kite, unicorn, hearts, crown | A rainbow sweeps across between two clouds, then a unicorn and **Bruce** in [Pacifico](https://fonts.google.com/specimen/Pacifico) appear with *sparkle on!* |
+| **`wild-encounter`** | handheld monster-catching games | Four-shade green handheld pixel art in menu boxes: bird, lightning, fire, water, backpack, map, egg, tent, paw, trade arrows, potion | A battle screen: flash, stripe wipe, then an original microchip creature slides in with HP bars, and *A wild BRUCE appeared!* types out |
 
 <!-- pop:start -->
 | Theme | Icons | Text / dim / bg | LED |
@@ -149,6 +150,7 @@ Tributes to pop culture and genres, each with its own art style instead of a sha
 | **`pixel-plumber`**<br><sub>[boot](previews/pop/pixel-plumber-boot.gif)</sub> | <img src="previews/pop/pixel-plumber-icons.png" width="420"> | ![](https://placehold.co/12x12/FFFFFF/FFFFFF.png) ![](https://placehold.co/12x12/183C9C/183C9C.png) ![](https://placehold.co/12x12/5A95FF/5A95FF.png)<br><sub>`ffff` `19f3` `5cbf`</sub> | ![](https://placehold.co/12x12/E40058/E40058.png) |
 | **`rainbow-pony`**<br><sub>[boot](previews/pop/rainbow-pony-boot.gif)</sub> | <img src="previews/pop/rainbow-pony-icons.png" width="420"> | ![](https://placehold.co/12x12/9C4CCD/9C4CCD.png) ![](https://placehold.co/12x12/BD8DD5/BD8DD5.png) ![](https://placehold.co/12x12/F6EAFF/F6EAFF.png)<br><sub>`9a79` `bc7a` `f75f`</sub> | ![](https://placehold.co/12x12/FF7EB9/FF7EB9.png) |
 | **`steampunk`**<br><sub>[boot](previews/pop/steampunk-boot.gif)</sub> | <img src="previews/pop/steampunk-icons.png" width="420"> | ![](https://placehold.co/12x12/EEC273/EEC273.png) ![](https://placehold.co/12x12/8B6939/8B6939.png) ![](https://placehold.co/12x12/181408/181408.png)<br><sub>`ee0e` `8b47` `18a1`</sub> | ![](https://placehold.co/12x12/D4892A/D4892A.png) |
+| **`wild-encounter`**<br><sub>[boot](previews/pop/wild-encounter-boot.gif)</sub> | <img src="previews/pop/wild-encounter-icons.png" width="420"> | ![](https://placehold.co/12x12/083808/083808.png) ![](https://placehold.co/12x12/316131/316131.png) ![](https://placehold.co/12x12/9CBE08/9CBE08.png)<br><sub>`9c1` `3306` `9de1`</sub> | ![](https://placehold.co/12x12/40FF40/40FF40.png) |
 <!-- pop:end -->
 
 > All pop art is drawn by the generator from generic icon glyphs and shapes. There's no official artwork, sprites or logos, and no affiliation with any rights holder.
