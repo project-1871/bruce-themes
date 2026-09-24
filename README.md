@@ -6,7 +6,7 @@
 generated straight from [Omarchy](https://omarchy.org) desktop color palettes.**
 
 <img src="previews/japglitch-boot.gif" width="320" alt="Japglitch boot animation">&nbsp;&nbsp;<img src="previews/neon-unix-legs-boot.gif" width="320" alt="Neon Unix Legs boot animation">
-<br><img src="previews/hypr-heels-boot.gif" width="320" alt="Hypr Heels boot animation">
+<br><img src="previews/hypr-heels-boot.gif" width="320" alt="Hypr Heels boot animation">&nbsp;&nbsp;<img src="previews/omarfu-boot.gif" width="320" alt="Omarfu boot animation">
 
 `320×240` · `CYD ESP32-2432S028R` · `Bruce 1.16.1` · `fits in 192 KB of LittleFS`
 
@@ -43,13 +43,23 @@ Lavender white on deep plum, split into crimson/violet.
 |---|---|---|---|---|
 | `ff7f` ![](https://placehold.co/12x12/FBEEFF/FBEEFF.png) | `acd5` ![](https://placehold.co/12x12/A99BAD/A99BAD.png) | `1882` ![](https://placehold.co/12x12/1A1014/1A1014.png) | ![](https://placehold.co/12x12/F5003E/F5003E.png) `#F5003E` ![](https://placehold.co/12x12/A91DFE/A91DFE.png) `#A91DFE` | `F5003E` |
 
+### `omarfu`
+Mint white on charcoal, split into lime/hot pink.
+
+<img src="previews/omarfu-icons.png" width="600" alt="omarfu icons">
+
+| priColor | secColor | bgColor | fringe | LED |
+|---|---|---|---|---|
+| `e79b` ![](https://placehold.co/12x12/E4F1DE/E4F1DE.png) | `94f1` ![](https://placehold.co/12x12/929F8C/929F8C.png) | `10a2` ![](https://placehold.co/12x12/161616/161616.png) | ![](https://placehold.co/12x12/67D830/67D830.png) `#67D830` ![](https://placehold.co/12x12/E21F7C/E21F7C.png) `#E21F7C` | `67D830` |
+
 <details>
-<summary><b>Exact build commands for these three</b></summary>
+<summary><b>Exact build commands for these themes</b></summary>
 
 ```bash
 ./bruce-theme-gen.py japglitch      --fringe C921E4,2090E3 --littlefs
 ./bruce-theme-gen.py neon-unix-legs --littlefs
 ./bruce-theme-gen.py hypr-heels     --fringe F5003E,A91DFE --littlefs
+./bruce-theme-gen.py omarfu         --littlefs
 ```
 </details>
 
@@ -99,7 +109,7 @@ pip install -r requirements.txt
 ./bruce-theme-gen.py neon-unix-legs                      # -> themes/neon-unix-legs/
 ./bruce-theme-gen.py japglitch --fringe C921E4,2090E3    # pin the RGB-split colors
 ./bruce-theme-gen.py hypr-heels --littlefs               # + flashable hypr-heels-littlefs.bin
-./bruce-theme-gen.py omarfu --sd --boot-wallpaper        # PNG icons + wallpaper boot anim (SD only)
+./bruce-theme-gen.py redflag-sword --sd --boot-wallpaper        # PNG icons + wallpaper boot anim (SD only)
 ./bruce-theme-gen.py --colors ~/my/colors.toml --name mine
 ```
 
