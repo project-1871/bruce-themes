@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Rebuild the gallery GIFs and the README theme tables for every collection."""
-import json, re
+import json, re, runpy
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageSequence
 
@@ -39,11 +39,12 @@ def sw(h): return f"![](https://placehold.co/12x12/{h}/{h}.png)"
 
 
 def table(names, theme_dir, prev):
-    rows = ["| Theme | Icons | Text / dim / bg | LED |", "|---|---|---|---|"]
+    rows = ["| Theme / boot | Menu on the CYD · all icons | Text / dim / bg | LED |", "|---|---|---|---|"]
     for n in names:
         t = json.loads((ROOT / theme_dir / n / f"{n}.json").read_text())
         c = " ".join(sw(rgb565_to_hex(t[k])) for k in ("priColor", "secColor", "bgColor"))
-        rows.append(f"| **`{n}`**<br><sub>[boot]({prev}/{n}-boot.gif)</sub> | <img src=\"{prev}/{n}-icons.png\" width=\"420\"> "
+        rows.append(f"| **`{n}`**<br><img src=\"{prev}/{n}-boot.gif\" width=\"160\"> "
+                    f"| <img src=\"{prev}/{n}-menu.png\" width=\"420\"><br><img src=\"{prev}/{n}-icons.png\" width=\"420\"> "
                     f"| {c}<br><sub>`{t['priColor']}` `{t['secColor']}` `{t['bgColor']}`</sub> | {sw(t['ledColor'])} |")
     return "\n".join(rows)
 
@@ -53,6 +54,7 @@ def replace(readme, tag, body):
                   readme, flags=re.S)
 
 
+runpy.run_path(str(ROOT / "tools-menu-shots.py"), run_name="__main__")  # <name>-menu.png
 glitch, monster, pop = names_in("themes"), names_in("monster"), names_in("pop")
 gallery(glitch, ROOT / "previews", ROOT / "previews" / "gallery.gif")
 gallery(monster, ROOT / "previews" / "monster", ROOT / "previews" / "monster" / "gallery.gif", cols=5, tw=160, th=120)
