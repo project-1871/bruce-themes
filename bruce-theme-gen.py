@@ -158,7 +158,7 @@ def main():
     ap.add_argument("--out", type=Path, default=Path("themes"), help="output root (default: ./themes)")
     ap.add_argument("--fringe", help="override the RGB-split colors, e.g. C921E4,2090E3")
     ap.add_argument("--screen", default="320x240", help="device resolution WxH (default 320x240, CYD)")
-    ap.add_argument("--icon-size", type=int, help="icon px (default: 55%% of screen height, 75%% with --no-label)")
+    ap.add_argument("--icon-size", type=int, help="icon px (default: 65%% of screen height, 75%% with --no-label)")
     ap.add_argument("--no-label", action="store_true", help="hide menu names, use bigger icons")
     ap.add_argument("--sd", action="store_true", help="target microSD: PNG icons (sharper, needs cache space)")
     ap.add_argument("--boot-wallpaper", nargs="?", const="auto", help="use the theme wallpaper behind the boot title")
@@ -177,7 +177,7 @@ def main():
 
     pal = load_palette(colors)
     W, H = map(int, a.screen.lower().split("x"))
-    S = a.icon_size or int(H * (0.75 if a.no_label else 0.55))
+    S = a.icon_size or int(H * (0.75 if a.no_label else 0.65))
     bg, fg = pal["background"], pal["foreground"]
     sec = pal.get("color8", tuple((f + b) // 2 for f, b in zip(fg, bg)))
     fringes = tuple(hexrgb(c) for c in a.fringe.split(",")) if a.fringe else pick_fringes(pal)

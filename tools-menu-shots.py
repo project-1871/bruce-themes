@@ -53,6 +53,9 @@ def screen(tdir, t, key, label):
     if t.get("label", 1):
         d.rectangle((10, title_y, W - 11, title_y + 16 - 1), fill=bg)
     icon = Image.open(tdir / t[key]).convert("RGB")
+    r, g, b = icon.split()  # the panel is RGB565: quantize like the device so icon edges match the bg
+    icon = Image.merge("RGB", (r.point(lambda v: (v >> 3) * 255 // 31), g.point(lambda v: (v >> 2) * 255 // 63),
+                               b.point(lambda v: (v >> 3) * 255 // 31)))
     img.paste(icon, ((W - icon.width) // 2, 13 + (H - icon.height) // 2))
     if t.get("label", 1):
         d.rectangle((10, title_y, W - 11, title_y + 16 - 1), fill=bg)

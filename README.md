@@ -281,7 +281,7 @@ After adding a theme, `./tools-gallery.py` rebuilds the gallery GIFs, each theme
 | Flag | Default | |
 |---|---|---|
 | `--screen WxH` | `320x240` | Device resolution |
-| `--icon-size PX` | 55% of height | Icon size (75% with `--no-label`) |
+| `--icon-size PX` | 65% of height (156 px on the CYD) | Icon size (75% with `--no-label`) |
 | `--no-label` | off | Hide menu names under icons, use bigger icons |
 | `--sd` | off | PNG icons instead of JPG (sharper, see size notes) |
 | `--boot-wallpaper [FILE]` | off | Put the theme's wallpaper behind the boot title |

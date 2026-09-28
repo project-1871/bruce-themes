@@ -1898,15 +1898,17 @@ def littlefs_image(theme_dir, name, size=0x30000, block=4096):
 
 MIN_FREE = 5  # Bruce adds brucePins.conf + rewrites bruce.conf and wants >4 KB spare
 # JPG settings tried in order until the theme fits the CYD's 192 KB LittleFS
+# 156 px is the biggest icon that fits between the CYD status bar and the label; smaller sizes are
+# only used when a theme can't fit the LittleFS at the lowest JPG quality
+ICON_SIZES = [156, 148, 140, 132]
 QUALITY_STEPS = [(90, 0), (85, 2), (78, 2), (70, 2), (62, 2), (55, 2)]
 
 
 def build(name, a):
     t, icon_fn, boot_fn = THEMES[name]
-    W, H, S = 320, 240, 132
+    W, H = 320, 240
     out = a.out / name
     out.mkdir(parents=True, exist_ok=True)
-    icons_img = {key: icon_fn(key, S, t).convert("RGB") for key in MENUS}
     frames = boot_fn(W, H, t)
     frames[0].save(out / "boot.gif", save_all=True, append_images=frames[1:],
                    duration=[140] * (len(frames) - 1) + [1500], loop=1, optimize=True)
@@ -1917,9 +1919,12 @@ def build(name, a):
     (out / f"{name}.json").write_text(json.dumps(theme, indent=2) + "\n")
     steps = QUALITY_STEPS if name in PIXEL_STYLE else QUALITY_STEPS[1:]
     img = None
-    for qual, sub in steps:
-        for key, im in icons_img.items(): im.save(out / f"{key}.jpg", quality=qual, subsampling=sub)
-        img = littlefs_image(out, name)
+    for S in ICON_SIZES:
+        icons_img = {key: icon_fn(key, S, t).convert("RGB") for key in MENUS}
+        for qual, sub in steps:
+            for key, im in icons_img.items(): im.save(out / f"{key}.jpg", quality=qual, subsampling=sub)
+            img = littlefs_image(out, name)
+            if img and 48 - img[1] >= MIN_FREE: break
         if img and 48 - img[1] >= MIN_FREE: break
     prev = a.out.parent / "previews" / a.out.name
     prev.mkdir(parents=True, exist_ok=True)
@@ -1935,7 +1940,7 @@ def build(name, a):
     if not img or 48 - img[1] < MIN_FREE:
         print(f"{name}: {kb:.0f} KB (boot {boot_kb:.0f} KB)  !! does NOT fit the CYD LittleFS even at q{qual}; SD card only")
         return False
-    print(f"{name}: {kb:.0f} KB (boot {boot_kb:.0f} KB), icons q{qual}, {img[1]}/48 blocks")
+    print(f"{name}: {kb:.0f} KB (boot {boot_kb:.0f} KB), icons {S}px q{qual}, {img[1]}/48 blocks")
     if a.littlefs: (ROOT / "local" / f"{name}-littlefs.bin").write_bytes(img[0])
     return True
 

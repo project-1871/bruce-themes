@@ -162,7 +162,7 @@ def build_littlefs(theme_dir, name, out, size, block=4096):
 def build(name, pal, a):
     bg, fg, dim, drip_c, glow_c = map(hexrgb, pal)
     W, H = map(int, a.screen.lower().split("x"))
-    S = int(H * 0.55)
+    S = int(H * 0.65)  # 156 on the CYD: fills the space between status bar and label
     out = a.out / name
     out.mkdir(parents=True, exist_ok=True)
     gfont = font(NERD_FONTS, int(S * 0.62))
